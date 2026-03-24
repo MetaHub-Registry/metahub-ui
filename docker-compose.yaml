@@ -1,0 +1,19 @@
+services:
+  metahub-ui:
+    build: .
+    ports:
+      - "8082:80"
+    environment:
+      - METAHUB_API_URL=http://metahub-api:8080
+    depends_on:
+      - metahub-api
+
+  metahub-api:
+    image: registry.gitlab.com/qnib-golang/metahub-api:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - CORS_ENABLED=true
+      - FRONTEND_REDIRECT=http://localhost:8082
+    volumes:
+      - ./misc/config:/etc/metahub-api
