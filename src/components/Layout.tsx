@@ -174,6 +174,14 @@ export function Layout() {
           </ErrorBoundary>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="border-border border-t py-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 text-xs text-muted-foreground">
+          <span>&copy; {new Date().getFullYear()} Christian Kniep. All rights reserved.</span>
+          <span>v{__APP_VERSION__}</span>
+        </div>
+      </footer>
     </div>
   );
 }
