@@ -1,93 +1,137 @@
-# metahub-ui
+# MetaHub UI
 
+Web frontend for [metahub-api](https://gitlab.com/qnib-golang/metahub-api) -- a container image registry with profile-aware image indexes.
 
+Built with React, TypeScript, Vite, Tailwind CSS, and shadcn/ui.
 
-## Getting started
+## Features
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+- **Authentik login** -- OIDC authentication via metahub-api's Authentik integration
+- **Collection browser** -- hierarchical navigation of container image collections with breadcrumbs, search/filter, and drill-down to individual tags
+- **Profile filtering** -- select a profile (e.g. `generic`, `zen3`, `strix-halo`) to see which images in a collection match that profile's OCI image index
+- **Registry credentials** -- create/revoke registry tokens and get a ready-to-copy `docker login` command
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Development
 
-## Add your files
+### Prerequisites
 
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+- Node.js 20+
+- A running `metahub-api` instance (default: `http://localhost:8080`)
+
+### Setup
+
+```bash
+npm install
+npm run dev
+```
+
+The Vite dev server starts at `http://localhost:5173` and proxies `/api/` requests to `http://localhost:8080` (configurable in `vite.config.ts`).
+
+### Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server with HMR |
+| `npm run build` | Type-check and build for production |
+| `npm run preview` | Preview production build locally |
+| `npm test` | Run tests (Vitest) |
+| `npm run test:coverage` | Run tests with coverage report |
+| `npm run lint` | Lint with ESLint |
+
+### Testing
+
+```bash
+# Run tests
+npm test
+
+# Run with coverage (generates coverage/lcov.info for SonarQube)
+npm run test:coverage
+```
+
+Coverage output:
+- `coverage/lcov.info` -- LCOV format (for SonarQube)
+- `coverage/lcov-report/index.html` -- HTML report (open in browser)
+
+### SonarQube
+
+```bash
+# Generate coverage first
+npm run test:coverage
+
+# Submit to SonarQube
+./misc/bin/sonar.sh
+```
+
+The script reads `SONAR_QUBE_URL`, `SONAR_QUBE_TOKEN`, and `SONAR_QUBE_PROJECT` from `.env`.
+
+## Deployment
+
+### Docker
+
+Build and run as a container:
+
+```bash
+docker build -t metahub-ui .
+docker run -p 8082:80 -e METAHUB_API_URL=https://api.metahub.example.com metahub-ui
+```
+
+The `METAHUB_API_URL` environment variable configures which metahub-api instance the frontend talks to. It is injected into the built JavaScript at container startup.
+
+### docker-compose
+
+For local development with metahub-api:
+
+```bash
+docker compose up
+```
+
+This starts:
+- `metahub-ui` on port `8082`
+- `metahub-api` on port `8080` (with CORS enabled)
+
+### nginx
+
+The container serves the SPA via nginx with:
+- SPA fallback (`try_files $uri /index.html`) so client-side routing works
+- Aggressive caching for `/assets/` (hashed filenames, 1 year expiry)
+- No-cache for `index.html` (so deployments take effect immediately)
+
+No API reverse proxy -- the frontend communicates with metahub-api cross-origin (CORS must be enabled on the API: `cors.enabled: true`).
+
+## Configuration
+
+### API URL
+
+The frontend resolves the metahub-api base URL in this order:
+
+1. **Runtime config** -- `METAHUB_API_URL` env var (set at container startup via `docker-entrypoint.sh`)
+2. **localStorage override** -- `metahub_api_base_url` key (useful for development/debugging)
+3. **Same-origin fallback** -- empty string (works with the Vite dev proxy)
+
+### Profiles
+
+Profile definitions are currently static (`src/data/profiles.ts`). A future `GET /api/v1/profiles` endpoint on metahub-api will replace this with dynamic data -- at that point the change is a one-line swap in the data fetching layer.
+
+### Authentication
+
+The frontend uses metahub-api's OIDC flow:
+1. User clicks Login, browser redirects to `/api/v1/login`
+2. metahub-api redirects to Authentik
+3. After authentication, Authentik redirects back to metahub-api's callback
+4. metahub-api redirects to the frontend's `/callback#access_token=<token>`
+5. The frontend extracts the token and uses it as a Bearer token for protected API calls
+
+The access token is stored in `sessionStorage` (cleared when the tab closes).
+
+## Project Structure
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/qnib-frontend/metahub-ui.git
-git branch -M main
-git push -uf origin main
+src/
+  components/       # Reusable components (Layout, Breadcrumbs, CopyButton, etc.)
+  components/ui/    # shadcn/ui generated components
+  contexts/         # React contexts (AuthContext)
+  data/             # Static data (profiles)
+  lib/              # API client, utilities
+  pages/            # Route page components
+  test/             # Test setup and utilities
 ```
-
-## Integrate with your tools
-
-* [Set up project integrations](https://gitlab.com/qnib-frontend/metahub-ui/-/settings/integrations)
-
-## Collaborate with your team
-
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
