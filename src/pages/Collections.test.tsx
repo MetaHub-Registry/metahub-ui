@@ -23,8 +23,8 @@ describe("Collections", () => {
   it("renders the page title", async () => {
     mockFetchCollections.mockResolvedValue({
       next: {},
-      breadcrumbs: [],
-      slug: "",
+      bread_crumbs: [],
+      slug_end: "",
     });
 
     renderWithProviders(<Collections />, {
@@ -55,22 +55,22 @@ describe("Collections", () => {
         qnib: {
           repo: "qnib",
           tag: "",
-          col_id: "",
-          tag_id: "",
-          col_count: 5,
-          mani_count: 0,
+          collection_id: 0,
+          tag_id: 0,
+          collection_count: 5,
+          manifest_count: 0,
         },
         biocontainers: {
           repo: "biocontainers",
           tag: "",
-          col_id: "",
-          tag_id: "",
-          col_count: 12,
-          mani_count: 0,
+          collection_id: 0,
+          tag_id: 0,
+          collection_count: 12,
+          manifest_count: 0,
         },
       },
-      breadcrumbs: [],
-      slug: "",
+      bread_crumbs: [],
+      slug_end: "",
     });
 
     renderWithProviders(<Collections />, {
@@ -89,14 +89,14 @@ describe("Collections", () => {
         qnib: {
           repo: "qnib",
           tag: "",
-          col_id: "",
-          tag_id: "",
-          col_count: 5,
-          mani_count: 0,
+          collection_id: 0,
+          tag_id: 0,
+          collection_count: 5,
+          manifest_count: 0,
         },
       },
-      breadcrumbs: [],
-      slug: "",
+      bread_crumbs: [],
+      slug_end: "",
     });
 
     renderWithProviders(<Collections />, {
@@ -114,14 +114,14 @@ describe("Collections", () => {
         latest: {
           repo: "qnib/featuretest",
           tag: "latest",
-          col_id: "col-1",
-          tag_id: "tag-1",
-          col_count: 0,
-          mani_count: 13,
+          collection_id: 0,
+          tag_id: 0,
+          collection_count: 0,
+          manifest_count: 13,
         },
       },
-      breadcrumbs: [],
-      slug: "",
+      bread_crumbs: [],
+      slug_end: "",
     });
 
     renderWithProviders(<Collections />, {
@@ -139,22 +139,22 @@ describe("Collections", () => {
         qnib: {
           repo: "qnib",
           tag: "",
-          col_id: "",
-          tag_id: "",
-          col_count: 5,
-          mani_count: 0,
+          collection_id: 0,
+          tag_id: 0,
+          collection_count: 5,
+          manifest_count: 0,
         },
         biocontainers: {
           repo: "biocontainers",
           tag: "",
-          col_id: "",
-          tag_id: "",
-          col_count: 12,
-          mani_count: 0,
+          collection_id: 0,
+          tag_id: 0,
+          collection_count: 12,
+          manifest_count: 0,
         },
       },
-      breadcrumbs: [],
-      slug: "",
+      bread_crumbs: [],
+      slug_end: "",
     });
 
     renderWithProviders(<Collections />, {
@@ -178,14 +178,14 @@ describe("Collections", () => {
         qnib: {
           repo: "qnib",
           tag: "",
-          col_id: "",
-          tag_id: "",
-          col_count: 5,
-          mani_count: 0,
+          collection_id: 0,
+          tag_id: 0,
+          collection_count: 5,
+          manifest_count: 0,
         },
       },
-      breadcrumbs: [],
-      slug: "",
+      bread_crumbs: [],
+      slug_end: "",
     });
 
     renderWithProviders(<Collections />, {
@@ -209,14 +209,14 @@ describe("Collections", () => {
         qnib: {
           repo: "qnib",
           tag: "",
-          col_id: "",
-          tag_id: "",
-          col_count: 5,
-          mani_count: 0,
+          collection_id: 0,
+          tag_id: 0,
+          collection_count: 5,
+          manifest_count: 0,
         },
       },
-      breadcrumbs: [],
-      slug: "",
+      bread_crumbs: [],
+      slug_end: "",
     });
 
     renderWithProviders(<Collections />, {
@@ -253,10 +253,10 @@ describe("Collections", () => {
   it("renders breadcrumbs when API returns them", async () => {
     mockFetchCollections.mockResolvedValue({
       next: {},
-      breadcrumbs: [
-        { crumb: "qnib", active: true, link: "qnib", tag: "", repo: "qnib", idx: 0 },
+      bread_crumbs: [
+        { crumb: "qnib", active: 1, link: "qnib", tag: "", repo: "qnib", idx: 0 },
       ],
-      slug: "qnib",
+      slug_end: "qnib",
     });
 
     renderWithProviders(<Collections />, {

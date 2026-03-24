@@ -19,36 +19,39 @@ import { fetchCollection } from "@/lib/api";
 const mockFetchCollection = vi.mocked(fetchCollection);
 
 const sampleData = {
-  name: "qnib/featuretest",
-  tag: "latest",
-  manifests: [
-    {
-      digest: "sha256:aaaa1111bbbb2222cccc3333dddd4444eeee5555ffff6666",
-      media_type: "application/vnd.oci.image.manifest.v1+json",
-      platform: { os: "linux", architecture: "amd64" },
-      size: 52428800,
-      registry: "docker.io",
-    },
-    {
-      digest: "sha256:bbbb2222cccc3333dddd4444eeee5555ffff6666aaaa1111",
-      media_type: "application/vnd.oci.image.manifest.v1+json",
-      platform: { os: "linux", architecture: "arm64", variant: "v8" },
-      size: 48234496,
-      registry: "quay.io",
-    },
-    {
-      digest: "sha256:cccc3333dddd4444eeee5555ffff6666aaaa1111bbbb2222",
-      media_type: "application/vnd.oci.image.manifest.v1+json",
-      platform: {
-        os: "linux",
-        architecture: "amd64",
-        features: ["cpu:zen3"],
+  collection: {
+    name: "qnib/featuretest",
+    tag: "latest",
+    manifests: [
+      {
+        digest: "sha256:aaaa1111bbbb2222cccc3333dddd4444eeee5555ffff6666",
+        media_type: "application/vnd.oci.image.manifest.v1+json",
+        platform: { os: "linux", architecture: "amd64" },
+        size: 52428800,
+        registry: "docker.io",
       },
-      size: 55000000,
-      registry: "registry.gitlab.com",
-    },
-  ],
-  breadcrumbs: [],
+      {
+        digest: "sha256:bbbb2222cccc3333dddd4444eeee5555ffff6666aaaa1111",
+        media_type: "application/vnd.oci.image.manifest.v1+json",
+        platform: { os: "linux", architecture: "arm64", variant: "v8" },
+        size: 48234496,
+        registry: "quay.io",
+      },
+      {
+        digest: "sha256:cccc3333dddd4444eeee5555ffff6666aaaa1111bbbb2222",
+        media_type: "application/vnd.oci.image.manifest.v1+json",
+        platform: {
+          os: "linux",
+          architecture: "amd64",
+          features: ["cpu:zen3"],
+        },
+        size: 55000000,
+        registry: "registry.gitlab.com",
+      },
+    ],
+  },
+  repos: [],
+  bread_crumbs: [],
 };
 
 function renderCollectionDetail(initialPath = "/collection/col-1/tag/tag-1") {

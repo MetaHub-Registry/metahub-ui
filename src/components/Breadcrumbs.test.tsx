@@ -6,9 +6,9 @@ import type { BreadCrumb } from "@/lib/api";
 
 describe("Breadcrumbs", () => {
   const crumbs: BreadCrumb[] = [
-    { crumb: "qnib", active: false, link: "qnib", tag: "", repo: "qnib", idx: 0 },
-    { crumb: "featuretest", active: false, link: "qnib/featuretest", tag: "", repo: "qnib/featuretest", idx: 1 },
-    { crumb: "latest", active: true, link: "qnib/featuretest/latest", tag: "latest", repo: "qnib/featuretest", idx: 2 },
+    { crumb: "qnib", active: 0, link: "qnib", tag: "", repo: "qnib", idx: 0 },
+    { crumb: "featuretest", active: 0, link: "qnib/featuretest", tag: "", repo: "qnib/featuretest", idx: 1 },
+    { crumb: "latest", active: 1, link: "qnib/featuretest/latest", tag: "latest", repo: "qnib/featuretest", idx: 2 },
   ];
 
   it("renders a Home link", () => {

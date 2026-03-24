@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  fetchUserSecrets,
-  createUserSecret,
-  deleteUserSecret,
+  fetchRegistryTokens,
+  createRegistryToken,
+  deleteRegistryToken,
   getApiBaseUrl,
+  type RegistryToken,
+  type RegistryTokenCreateResponse,
 } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -27,11 +29,9 @@ import { toast } from "sonner";
 export function Settings() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [newTokenName, setNewTokenName] = useState("");
-  const [createdSecret, setCreatedSecret] = useState<{
-    secret: string;
-    id: string;
-  } | null>(null);
+  const [newTokenDesc, setNewTokenDesc] = useState("");
+  const [createdToken, setCreatedToken] =
+    useState<RegistryTokenCreateResponse | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [selectedProfile, setSelectedProfile] = useState("");
 
@@ -39,20 +39,20 @@ export function Settings() {
     getApiBaseUrl().replace(/^https?:\/\//, "") || window.location.host;
 
   const {
-    data: secrets,
+    data: tokens,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["user-secrets"],
-    queryFn: fetchUserSecrets,
+    queryKey: ["registry-tokens"],
+    queryFn: fetchRegistryTokens,
   });
 
   const createMutation = useMutation({
-    mutationFn: (name: string) => createUserSecret(name),
+    mutationFn: (description: string) => createRegistryToken(description),
     onSuccess: (data) => {
-      setCreatedSecret(data);
-      setNewTokenName("");
-      queryClient.invalidateQueries({ queryKey: ["user-secrets"] });
+      setCreatedToken(data);
+      setNewTokenDesc("");
+      queryClient.invalidateQueries({ queryKey: ["registry-tokens"] });
       toast.success("Registry token created");
     },
     onError: (err) => {
@@ -63,10 +63,10 @@ export function Settings() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => deleteUserSecret(id),
+    mutationFn: (identifier: string) => deleteRegistryToken(identifier),
     onSuccess: () => {
       setDeleteConfirmId(null);
-      queryClient.invalidateQueries({ queryKey: ["user-secrets"] });
+      queryClient.invalidateQueries({ queryKey: ["registry-tokens"] });
       toast.success("Registry token revoked");
     },
     onError: (err) => {
@@ -137,29 +137,26 @@ export function Settings() {
               </DialogHeader>
               <div className="space-y-4">
                 <Input
-                  placeholder="Token name (e.g., my-laptop)"
-                  value={newTokenName}
-                  onChange={(e) => setNewTokenName(e.target.value)}
+                  placeholder="Token description (e.g., my-laptop)"
+                  value={newTokenDesc}
+                  onChange={(e) => setNewTokenDesc(e.target.value)}
                 />
-                {createdSecret && (
+                {createdToken && (
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-amber-600">
                       Copy this token now — you won't be able to see it again!
                     </p>
                     <div className="bg-muted flex items-center gap-2 rounded-md p-3">
                       <code className="text-foreground flex-1 break-all text-sm">
-                        {createdSecret.secret}
+                        {createdToken.password}
                       </code>
-                      <CopyButton text={createdSecret.secret} />
+                      <CopyButton text={createdToken.password} />
                     </div>
                     <div className="bg-muted flex items-center gap-2 rounded-md p-3">
                       <code className="text-foreground break-all text-sm">
-                        docker login {registryHost} -u{" "}
-                        {user?.login || "<username>"} -p {createdSecret.secret}
+                        {createdToken.docker_login}
                       </code>
-                      <CopyButton
-                        text={`docker login ${registryHost} -u ${user?.login || "<username>"} -p ${createdSecret.secret}`}
-                      />
+                      <CopyButton text={createdToken.docker_login} />
                     </div>
                   </div>
                 )}
@@ -170,18 +167,18 @@ export function Settings() {
                     <Button
                       variant="outline"
                       onClick={() => {
-                        setCreatedSecret(null);
-                        setNewTokenName("");
+                        setCreatedToken(null);
+                        setNewTokenDesc("");
                       }}
                     >
-                      {createdSecret ? "Done" : "Cancel"}
+                      {createdToken ? "Done" : "Cancel"}
                     </Button>
                   }
                 />
-                {!createdSecret && (
+                {!createdToken && (
                   <Button
-                    onClick={() => createMutation.mutate(newTokenName)}
-                    disabled={!newTokenName.trim() || createMutation.isPending}
+                    onClick={() => createMutation.mutate(newTokenDesc)}
+                    disabled={!newTokenDesc.trim() || createMutation.isPending}
                   >
                     {createMutation.isPending ? "Creating..." : "Create"}
                   </Button>
@@ -198,24 +195,23 @@ export function Settings() {
             Failed to load tokens:{" "}
             {error instanceof Error ? error.message : "Unknown error"}
           </div>
-        ) : secrets && secrets.length > 0 ? (
+        ) : tokens && tokens.length > 0 ? (
           <div className="grid gap-2">
-            {secrets.map((secret) => (
-              <Card key={secret.id}>
+            {tokens.map((token: RegistryToken) => (
+              <Card key={token.identifier}>
                 <CardHeader className="flex-row items-center justify-between py-3">
                   <div>
                     <CardTitle className="text-sm font-medium">
-                      {secret.name}
+                      {token.identifier}
                     </CardTitle>
                     <CardDescription className="text-xs">
-                      Created:{" "}
-                      {new Date(secret.created_at).toLocaleDateString()}
+                      {token.description}
                     </CardDescription>
                   </div>
                   <Dialog
-                    open={deleteConfirmId === secret.id}
+                    open={deleteConfirmId === token.identifier}
                     onOpenChange={(open) =>
-                      setDeleteConfirmId(open ? secret.id : null)
+                      setDeleteConfirmId(open ? token.identifier : null)
                     }
                   >
                     <DialogTrigger
@@ -223,7 +219,9 @@ export function Settings() {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => setDeleteConfirmId(secret.id)}
+                          onClick={() =>
+                            setDeleteConfirmId(token.identifier)
+                          }
                         >
                           Revoke
                         </Button>
@@ -233,8 +231,9 @@ export function Settings() {
                       <DialogHeader>
                         <DialogTitle>Revoke Token</DialogTitle>
                         <DialogDescription>
-                          Are you sure you want to revoke &quot;{secret.name}
-                          &quot;? This action cannot be undone.
+                          Are you sure you want to revoke &quot;
+                          {token.identifier}&quot;? This action cannot be
+                          undone.
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>
@@ -243,7 +242,9 @@ export function Settings() {
                         />
                         <Button
                           variant="destructive"
-                          onClick={() => deleteMutation.mutate(secret.id)}
+                          onClick={() =>
+                            deleteMutation.mutate(token.identifier)
+                          }
                           disabled={deleteMutation.isPending}
                         >
                           {deleteMutation.isPending ? "Revoking..." : "Revoke"}
