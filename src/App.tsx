@@ -18,6 +18,7 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/callback" element={<Callback />} />
+          <Route path="/profile" element={<Callback />} />
           <Route path="/collections" element={<Collections />} />
           <Route path="/collections/*" element={<Collections />} />
           <Route

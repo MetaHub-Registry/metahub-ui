@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchCollections, type CollectionNext } from "@/lib/api";
+import { fetchCollections } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -41,11 +41,11 @@ export function Collections() {
     return entries.filter(([key]) => key.toLowerCase().includes(lower));
   }, [data?.next, filter]);
 
-  const handleItemClick = (key: string, item: CollectionNext) => {
+  const handleItemClick = (key: string, item: { repo: string; tag: string; collection_id: number; tag_id: number; collection_count: number; manifest_count: number }) => {
     if (item.tag) {
       // This is a tag — navigate to collection detail
       navigate(
-        `/collection/${encodeURIComponent(item.col_id)}/tag/${encodeURIComponent(item.tag_id)}${selectedProfile ? `?profile=${selectedProfile}` : ""}`
+        `/collection/${encodeURIComponent(item.collection_id)}/tag/${encodeURIComponent(item.tag_id)}${selectedProfile ? `?profile=${selectedProfile}` : ""}`
       );
     } else {
       // This is a namespace/repo — drill down
@@ -79,8 +79,8 @@ export function Collections() {
       </div>
 
       {/* Breadcrumbs */}
-      {data?.breadcrumbs && data.breadcrumbs.length > 0 && (
-        <Breadcrumbs crumbs={data.breadcrumbs} profile={selectedProfile} />
+      {data?.bread_crumbs && data.bread_crumbs.length > 0 && (
+        <Breadcrumbs crumbs={data.bread_crumbs} profile={selectedProfile} />
       )}
 
       {/* Search / Filter */}
@@ -136,16 +136,16 @@ export function Collections() {
                   </CardTitle>
                   {!item.tag && (
                     <CardDescription className="text-xs">
-                      {item.col_count > 0 && (
-                        <span>{item.col_count} collection{item.col_count !== 1 ? "s" : ""}</span>
+                      {item.collection_count > 0 && (
+                        <span>{item.collection_count} collection{item.collection_count !== 1 ? "s" : ""}</span>
                       )}
                     </CardDescription>
                   )}
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
-                  {item.mani_count > 0 && (
+                  {item.manifest_count > 0 && (
                     <Badge variant="secondary">
-                      {item.mani_count} image{item.mani_count !== 1 ? "s" : ""}
+                      {item.manifest_count} image{item.manifest_count !== 1 ? "s" : ""}
                     </Badge>
                   )}
                   {!item.tag && (

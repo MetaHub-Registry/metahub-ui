@@ -112,6 +112,7 @@ export class ApiError extends Error {
 }
 
 // ─── API Types ──────────────────────────────────────────────────
+// Field names match the actual metahub-api JSON responses.
 
 export interface UserSession {
   id: string;
@@ -121,7 +122,7 @@ export interface UserSession {
 
 export interface BreadCrumb {
   crumb: string;
-  active: boolean;
+  active: number; // API returns int (0/1), not boolean
   link: string;
   tag: string;
   repo: string;
@@ -131,16 +132,16 @@ export interface BreadCrumb {
 export interface CollectionNext {
   repo: string;
   tag: string;
-  col_id: string;
-  tag_id: string;
-  col_count: number;
-  mani_count: number;
+  collection_id: number;
+  tag_id: number;
+  collection_count: number;
+  manifest_count: number;
 }
 
 export interface CollectionListResponse {
   next: Record<string, CollectionNext>;
-  breadcrumbs: BreadCrumb[];
-  slug: string;
+  bread_crumbs: BreadCrumb[];
+  slug_end: string;
 }
 
 export interface Manifest {
@@ -158,16 +159,34 @@ export interface Manifest {
 }
 
 export interface CollectionDetailResponse {
-  name: string;
-  tag: string;
-  manifests: Manifest[];
-  breadcrumbs: BreadCrumb[];
+  collection: {
+    name: string;
+    tag: string;
+    manifests: Manifest[];
+  };
+  repos: string[];
+  bread_crumbs: BreadCrumb[];
 }
 
 export interface UserSecret {
-  id: string;
+  id: number;
   name: string;
+  secret_key: string;
+  is_copied: boolean;
   created_at: string;
+}
+
+export interface RegistryToken {
+  identifier: string;
+  description: string;
+}
+
+export interface RegistryTokenCreateResponse {
+  identifier: string;
+  description: string;
+  docker_login: string;
+  username: string;
+  password: string;
 }
 
 // ─── API Functions ──────────────────────────────────────────────
@@ -175,17 +194,17 @@ export interface UserSecret {
 export function fetchCollections(repoPrefix: string) {
   return apiFetch<CollectionListResponse>("/api/v1/collections", {
     method: "POST",
-    body: JSON.stringify({ repo_prefix: repoPrefix }),
+    body: JSON.stringify({ repo: repoPrefix }),
   });
 }
 
 export function fetchCollection(
   repoName: string,
   tagName: string,
-  collectionId?: string,
-  tagId?: string
+  collectionId?: number,
+  tagId?: number
 ) {
-  const body: Record<string, string> = {};
+  const body: Record<string, string | number> = {};
   if (collectionId && tagId) {
     body.collection_id = collectionId;
     body.tag_id = tagId;
@@ -208,11 +227,14 @@ export function fetchLogout() {
 }
 
 export function fetchUserSecrets() {
-  return apiFetch<UserSecret[]>("/api/v1/protected/user/secrets");
+  return apiFetch<{ name: string; secret_key: string }>(
+    "/api/v1/protected/user/secret",
+    { method: "PUT", body: JSON.stringify({ name: "__list__" }) }
+  );
 }
 
 export function createUserSecret(name: string) {
-  return apiFetch<{ secret: string; id: string }>(
+  return apiFetch<{ name: string; secret_key: string }>(
     "/api/v1/protected/user/secret",
     {
       method: "PUT",
@@ -225,4 +247,27 @@ export function deleteUserSecret(id: string) {
   return apiFetch<void>(`/api/v1/protected/user/secret/${id}`, {
     method: "DELETE",
   });
+}
+
+// ─── Registry Token API (Authentik app passwords) ───────────────
+
+export function fetchRegistryTokens() {
+  return apiFetch<RegistryToken[]>("/api/v1/protected/registry-tokens");
+}
+
+export function createRegistryToken(description: string) {
+  return apiFetch<RegistryTokenCreateResponse>(
+    "/api/v1/protected/registry-token",
+    {
+      method: "POST",
+      body: JSON.stringify({ description }),
+    }
+  );
+}
+
+export function deleteRegistryToken(identifier: string) {
+  return apiFetch<void>(
+    `/api/v1/protected/registry-tokens/${encodeURIComponent(identifier)}`,
+    { method: "DELETE" }
+  );
 }

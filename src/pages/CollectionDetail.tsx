@@ -29,13 +29,15 @@ export function CollectionDetail() {
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["collection", id, tagId],
-    queryFn: () => fetchCollection("", "", id!, tagId!),
+    queryFn: () => fetchCollection("", "", Number(id), Number(tagId)),
     enabled: !!id && !!tagId,
   });
 
+  const collection = data?.collection;
+
   const sortedManifests = useMemo(() => {
-    if (!data?.manifests) return [];
-    const sorted = [...data.manifests].sort((a, b) => {
+    if (!collection?.manifests) return [];
+    const sorted = [...collection.manifests].sort((a, b) => {
       let cmp = 0;
       switch (sortBy) {
         case "platform":
@@ -54,13 +56,13 @@ export function CollectionDetail() {
       return sortAsc ? cmp : -cmp;
     });
     return sorted;
-  }, [data?.manifests, sortBy, sortAsc]);
+  }, [collection?.manifests, sortBy, sortAsc]);
 
   const matchCount = useMemo(() => {
-    if (!profile || !data?.manifests) return 0;
-    return data.manifests.filter((m) => manifestMatchesProfile(m, profile))
+    if (!profile || !collection?.manifests) return 0;
+    return collection.manifests.filter((m) => manifestMatchesProfile(m, profile))
       .length;
-  }, [data?.manifests, profile]);
+  }, [collection?.manifests, profile]);
 
   const handleSort = (key: SortKey) => {
     if (sortBy === key) {
@@ -96,31 +98,31 @@ export function CollectionDetail() {
     );
   }
 
-  if (!data) return null;
+  if (!data || !collection) return null;
 
   return (
     <div className="space-y-6">
       {/* Breadcrumbs */}
-      {data.breadcrumbs && data.breadcrumbs.length > 0 && (
-        <Breadcrumbs crumbs={data.breadcrumbs} profile={selectedProfile} />
+      {data.bread_crumbs && data.bread_crumbs.length > 0 && (
+        <Breadcrumbs crumbs={data.bread_crumbs} profile={selectedProfile} />
       )}
 
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
-            {data.name}
+            {collection.name}
             <span className="text-muted-foreground">:</span>
-            <span className="text-primary">{data.tag}</span>
+            <span className="text-primary">{collection.tag}</span>
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            {data.manifests.length} image
-            {data.manifests.length !== 1 ? "s" : ""} in this collection
+            {collection.manifests.length} image
+            {collection.manifests.length !== 1 ? "s" : ""} in this collection
           </p>
           {profile && (
             <p className="text-muted-foreground mt-1 text-sm">
               <span className="text-primary font-medium">{matchCount}</span> of{" "}
-              {data.manifests.length} images included in the{" "}
+              {collection.manifests.length} images included in the{" "}
               <span className="font-medium">{profile.name}</span> index
             </p>
           )}
