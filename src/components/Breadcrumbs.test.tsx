@@ -62,4 +62,49 @@ describe("Breadcrumbs", () => {
     renderWithProviders(<Breadcrumbs crumbs={crumbs} />);
     expect(screen.getByLabelText("Breadcrumb")).toBeInTheDocument();
   });
+
+  it("does not double-prefix /collections/ when link is a bare repo path", () => {
+    // Regression test: API now emits bare repo paths in link field.
+    // The component prepends /collections/ itself, so the href must be /collections/<link>
+    // and never /collections//collections/<link> or similar.
+    renderWithProviders(<Breadcrumbs crumbs={crumbs} />);
+    const qnibLink = screen.getByText("qnib").closest("a");
+    expect(qnibLink).toHaveAttribute("href", "/collections/qnib");
+    // Confirm no double-prefix
+    expect(qnibLink?.getAttribute("href")).not.toContain("/collections//");
+    expect(qnibLink?.getAttribute("href")).not.toMatch(/\/collections\/.*\/collections\//);
+  });
+
+  describe("ORAS section breadcrumbs", () => {
+    it("Home link points to /oras when section=oras", () => {
+      renderWithProviders(<Breadcrumbs crumbs={crumbs} section="oras" />);
+      const homeLink = screen.getByText("Home").closest("a");
+      expect(homeLink).toHaveAttribute("href", "/oras");
+    });
+
+    it("inactive crumb links to /oras/<path> when section=oras", () => {
+      renderWithProviders(<Breadcrumbs crumbs={crumbs} section="oras" />);
+      const qnibLink = screen.getByText("qnib").closest("a");
+      expect(qnibLink).toHaveAttribute("href", "/oras/qnib");
+    });
+
+    it("multi-segment crumb links to /oras/<path> when section=oras", () => {
+      renderWithProviders(<Breadcrumbs crumbs={crumbs} section="oras" />);
+      const ftLink = screen.getByText("featuretest").closest("a");
+      expect(ftLink).toHaveAttribute("href", "/oras/qnib/featuretest");
+    });
+
+    it("active crumb is still plain text even with section=oras", () => {
+      renderWithProviders(<Breadcrumbs crumbs={crumbs} section="oras" />);
+      const latestElement = screen.getByText("latest");
+      expect(latestElement.tagName).not.toBe("A");
+      expect(latestElement.closest("a")).toBeNull();
+    });
+
+    it("defaults to /collections when section prop is not provided", () => {
+      renderWithProviders(<Breadcrumbs crumbs={crumbs} />);
+      const homeLink = screen.getByText("Home").closest("a");
+      expect(homeLink).toHaveAttribute("href", "/collections");
+    });
+  });
 });

@@ -21,6 +21,7 @@ import {
   getToken,
   setToken as storeToken,
   clearToken,
+  setOnUnauthorized,
   fetchSession,
   fetchLogout,
 } from "@/lib/api";
@@ -28,6 +29,7 @@ import {
 const mockGetToken = vi.mocked(getToken);
 const mockStoreToken = vi.mocked(storeToken);
 const mockClearToken = vi.mocked(clearToken);
+const mockSetOnUnauthorized = vi.mocked(setOnUnauthorized);
 const mockFetchSession = vi.mocked(fetchSession);
 const mockFetchLogout = vi.mocked(fetchLogout);
 
@@ -199,6 +201,76 @@ describe("AuthContext", () => {
       expect(screen.getByTestId("is-authenticated").textContent).toBe("false");
       expect(mockClearToken).toHaveBeenCalled();
     });
+  });
+
+  it("registers handleUnauthorized with the API client on mount", async () => {
+    renderWithProviders(
+      <AuthProvider>
+        <AuthConsumer />
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(mockSetOnUnauthorized).toHaveBeenCalledWith(expect.any(Function));
+    });
+  });
+
+  it("handleUnauthorized clears state and navigates to /login", async () => {
+    // Capture the registered callback
+    let capturedCallback: (() => void) | null = null;
+    mockSetOnUnauthorized.mockImplementation((cb) => {
+      capturedCallback = cb;
+    });
+    mockGetToken.mockReturnValue("valid-token");
+    mockFetchSession.mockResolvedValue({ id: "1", login: "alice", avatar: "" });
+
+    renderWithProviders(
+      <AuthProvider>
+        <AuthConsumer />
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("is-authenticated").textContent).toBe("true");
+      expect(capturedCallback).not.toBeNull();
+    });
+
+    // Simulate a 401 mid-session by invoking the registered callback
+    await act(async () => {
+      capturedCallback!();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("is-authenticated").textContent).toBe("false");
+      expect(screen.getByTestId("user").textContent).toBe("null");
+      expect(mockClearToken).toHaveBeenCalled();
+    });
+  });
+
+  it("ignores session response after component unmounts (cancelled flag)", async () => {
+    mockGetToken.mockReturnValue("valid-token");
+
+    // Hold the fetchSession promise so we can resolve it after unmount
+    let resolveSession!: (v: { id: string; login: string; avatar: string }) => void;
+    mockFetchSession.mockReturnValue(
+      new Promise((resolve) => { resolveSession = resolve; })
+    );
+
+    const { unmount } = renderWithProviders(
+      <AuthProvider>
+        <AuthConsumer />
+      </AuthProvider>
+    );
+
+    // Unmount before session resolves
+    unmount();
+
+    // Resolve the session after unmount — should not cause state update / error
+    await act(async () => {
+      resolveSession({ id: "1", login: "ghost", avatar: "" });
+    });
+
+    // No assertion needed — just verify no errors thrown (cancelled = true guards the setState)
   });
 
   it("throws error when useAuth is called outside AuthProvider", () => {

@@ -1,0 +1,12 @@
+version: '3'
+
+tasks:
+  git:*:
+    vars:
+      GCMD: '{{index .MATCH 0}}' 
+    cmds:
+      - git commit -{{.GCMD}} {{.CLI_ARGS}}
+      - git push
+  build:
+    cmds:
+      - docker build . -t metahub-ui

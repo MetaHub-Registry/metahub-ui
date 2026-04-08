@@ -7,6 +7,8 @@ import { Login } from "@/pages/Login";
 import { Callback } from "@/pages/Callback";
 import { Collections } from "@/pages/Collections";
 import { CollectionDetail } from "@/pages/CollectionDetail";
+import { OrasArtifacts } from "@/pages/OrasArtifacts";
+import { OrasArtifactDetail } from "@/pages/OrasArtifactDetail";
 import { Profiles } from "@/pages/Profiles";
 import { Settings } from "@/pages/Settings";
 
@@ -25,6 +27,9 @@ function App() {
             path="/collection/:id/tag/:tagId"
             element={<CollectionDetail />}
           />
+          <Route path="/oras" element={<OrasArtifacts />} />
+          <Route path="/oras/*" element={<OrasArtifacts />} />
+          <Route path="/oras/artifact" element={<OrasArtifactDetail />} />
           <Route path="/profiles" element={<Profiles />} />
           <Route path="/profiles/:name" element={<Profiles />} />
           <Route
