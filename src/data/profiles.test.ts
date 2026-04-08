@@ -85,4 +85,53 @@ describe("manifestMatchesProfile", () => {
     };
     expect(manifestMatchesProfile(manifest, zen3Profile)).toBe(false);
   });
+
+  it("plat rule matches on architecture key", () => {
+    const archProfile = {
+      name: "amd64-only",
+      description: "AMD64 only",
+      rules: [{ type: "plat", key: "architecture", op: "eq", value: "amd64" }],
+    };
+    const matching = { platform: { os: "linux", architecture: "amd64" } };
+    const nonMatching = { platform: { os: "linux", architecture: "arm64" } };
+    expect(manifestMatchesProfile(matching, archProfile)).toBe(true);
+    expect(manifestMatchesProfile(nonMatching, archProfile)).toBe(false);
+  });
+
+  it("plat rule with unknown key returns false", () => {
+    const unknownKeyProfile = {
+      name: "unknown-key",
+      description: "Unknown key profile",
+      rules: [{ type: "plat", key: "variant", op: "eq", value: "v8" }],
+    };
+    const manifest = { platform: { os: "linux", architecture: "arm64" } };
+    expect(manifestMatchesProfile(manifest, unknownKeyProfile)).toBe(false);
+  });
+
+  it("rule with unknown type returns false", () => {
+    const unknownTypeProfile = {
+      name: "unknown-type",
+      description: "Unknown type profile",
+      rules: [{ type: "gpu", key: "model", op: "eq", value: "a100" }],
+    };
+    const manifest = { platform: { os: "linux", architecture: "amd64" } };
+    expect(manifestMatchesProfile(manifest, unknownTypeProfile)).toBe(false);
+  });
+
+  it("profile with no rules matches everything", () => {
+    const emptyProfile = { name: "empty", description: "No rules", rules: [] };
+    const manifest = { platform: { os: "linux", architecture: "amd64" } };
+    expect(manifestMatchesProfile(manifest, emptyProfile)).toBe(true);
+  });
+
+  it("cpu rule with no features array returns false", () => {
+    const cpuProfile = {
+      name: "zen3-cpu",
+      description: "Zen3",
+      rules: [{ type: "cpu", key: "zen3", op: "eq", value: "true" }],
+    };
+    // No features array at all
+    const manifest = { platform: { os: "linux", architecture: "amd64" } };
+    expect(manifestMatchesProfile(manifest, cpuProfile)).toBe(false);
+  });
 });

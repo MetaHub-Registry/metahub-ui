@@ -104,7 +104,7 @@ export function CollectionDetail() {
     <div className="space-y-6">
       {/* Breadcrumbs */}
       {data.bread_crumbs && data.bread_crumbs.length > 0 && (
-        <Breadcrumbs crumbs={data.bread_crumbs} profile={selectedProfile} />
+        <Breadcrumbs crumbs={data.bread_crumbs} profile={selectedProfile} section="collections" />
       )}
 
       {/* Header */}

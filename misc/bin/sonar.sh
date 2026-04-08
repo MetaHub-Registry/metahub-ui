@@ -28,4 +28,5 @@ sonar-scanner ${TAG_ARG} \
   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
   -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info \
   -Dsonar.host.url=${SONAR_QUBE_URL} \
-  -Dsonar.token=${SONAR_QUBE_TOKEN}
+  -Dsonar.token=${SONAR_QUBE_TOKEN} \
+  -Dsonar.scm.disabled=true

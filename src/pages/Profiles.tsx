@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import {
   Card,
   CardHeader,
@@ -11,14 +12,32 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { profiles, getProfileByName } from "@/data/profiles";
+import { fetchProfiles } from "@/lib/api";
+import { profiles as STATIC_PROFILES } from "@/data/profiles";
 
 export function Profiles() {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
 
+  // Fetch profiles from the API; fall back to static profiles while loading
+  const { data } = useQuery({
+    queryKey: ["profiles"],
+    queryFn: fetchProfiles,
+    initialData: {
+      profiles: STATIC_PROFILES.map((p) => ({
+        id: 0,
+        name: p.name,
+        tag: "",
+        label: p.description,
+        rules: p.rules.map((r, i) => ({ id: i, type: r.type, op: r.op, key: r.key, value: r.value })),
+      })),
+    },
+  });
+
+  const profileList = data?.profiles ?? [];
+
   // If a specific profile is selected, show its detail
-  const selectedProfile = name ? getProfileByName(name) : undefined;
+  const selectedProfile = name ? profileList.find((p) => p.name === name) : undefined;
 
   if (selectedProfile) {
     return (
@@ -28,18 +47,21 @@ export function Profiles() {
             Profile: {selectedProfile.name}
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            {selectedProfile.description}
+            {selectedProfile.label}
           </p>
         </div>
 
         <div>
           <h2 className="mb-2 text-lg font-semibold">Matching Rules</h2>
           <div className="flex flex-wrap gap-2">
-            {selectedProfile.rules.map((rule, i) => (
-              <Badge key={i} variant="outline" className="font-mono text-sm">
+            {selectedProfile.rules.map((rule) => (
+              <Badge key={`${rule.type}-${rule.key}-${rule.value}`} variant="outline" className="font-mono text-sm">
                 {rule.type}:{rule.key} {rule.op} {rule.value}
               </Badge>
             ))}
+            {selectedProfile.rules.length === 0 && (
+              <p className="text-muted-foreground text-sm">No rules defined for this profile.</p>
+            )}
           </div>
         </div>
 
@@ -68,7 +90,7 @@ export function Profiles() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {profiles.map((profile) => (
+        {profileList.map((profile) => (
           <Card
             key={profile.name}
             className="cursor-pointer transition-colors hover:bg-muted/50"
@@ -87,9 +109,9 @@ export function Profiles() {
                   <TooltipTrigger
                     render={
                       <div className="flex gap-1">
-                        {profile.rules.map((rule, i) => (
+                        {profile.rules.map((rule) => (
                           <Badge
-                            key={i}
+                            key={`${rule.type}-${rule.key}`}
                             variant="outline"
                             className="font-mono text-xs"
                           >
@@ -101,8 +123,8 @@ export function Profiles() {
                   />
                   <TooltipContent>
                     <div className="space-y-1">
-                      {profile.rules.map((rule, i) => (
-                        <p key={i} className="text-xs">
+                      {profile.rules.map((rule) => (
+                        <p key={`${rule.type}-${rule.key}-${rule.value}`} className="text-xs">
                           {rule.type}:{rule.key} {rule.op} {rule.value}
                         </p>
                       ))}
@@ -111,7 +133,7 @@ export function Profiles() {
                 </Tooltip>
               </div>
               <CardDescription className="text-xs">
-                {profile.description}
+                {profile.label}
               </CardDescription>
             </CardHeader>
           </Card>

@@ -191,6 +191,38 @@ export interface RegistryTokenCreateResponse {
 
 // ─── API Functions ──────────────────────────────────────────────
 
+// ─── ORAS Types ─────────────────────────────────────────────────
+
+export interface OrasListing {
+  repo: string;
+  artifact_type: string;
+  artifact_count: number;
+}
+
+export interface OrasArtifact {
+  id: number;
+  repo: string;
+  digest: string;
+  media_type: string;
+  artifact_type: string;
+  annotations: Record<string, string>;
+  subject?: Manifest;
+  blobs: Manifest[];
+}
+
+export interface OrasListResponse {
+  next: Record<string, OrasListing>;
+  bread_crumbs: BreadCrumb[];
+  slug_end: number;
+}
+
+export interface OrasArtifactResponse {
+  artifact: OrasArtifact;
+  bread_crumbs: BreadCrumb[];
+}
+
+// ─── Collections API calls ──────────────────────────────────────
+
 export function fetchCollections(repoPrefix: string) {
   return apiFetch<CollectionListResponse>("/api/v1/collections", {
     method: "POST",
@@ -216,6 +248,16 @@ export function fetchCollection(
     method: "POST",
     body: JSON.stringify(body),
   });
+}
+
+export function fetchOrasArtifacts(repoPrefix: string) {
+  const params = repoPrefix ? `?repo=${encodeURIComponent(repoPrefix)}` : "";
+  return apiFetch<OrasListResponse>(`/api/v1/oras${params}`);
+}
+
+export function fetchOrasArtifact(repo: string, artifactType: string) {
+  const params = new URLSearchParams({ repo, artifact_type: artifactType });
+  return apiFetch<OrasArtifactResponse>(`/api/v1/oras/artifact?${params.toString()}`);
 }
 
 export function fetchSession() {
@@ -270,4 +312,96 @@ export function deleteRegistryToken(identifier: string) {
     `/api/v1/protected/registry-tokens/${encodeURIComponent(identifier)}`,
     { method: "DELETE" }
   );
+}
+
+// ─── Auth-mode discovery & god-mode login ───────────────────────
+
+export interface AuthConfig {
+  oidc_enabled: boolean;
+  godmode_enabled: boolean;
+}
+
+/**
+ * Fetches the public auth-mode discovery endpoint so the UI can decide which
+ * login flow to render. The call is intentionally unauthenticated and does
+ * NOT use `apiFetch` (which would attach a stale Bearer token).
+ *
+ * Throws ApiError on any non-2xx response or network failure.
+ */
+export async function fetchAuthConfig(): Promise<AuthConfig> {
+  const baseUrl = getApiBaseUrl();
+  const response = await fetch(`${baseUrl}/api/v1/auth/config`, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+  });
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new ApiError(text || response.statusText, response.status);
+  }
+  const data = (await response.json()) as Partial<AuthConfig>;
+  if (
+    typeof data?.oidc_enabled !== "boolean" ||
+    typeof data?.godmode_enabled !== "boolean"
+  ) {
+    throw new ApiError("malformed auth config response", 502);
+  }
+  return { oidc_enabled: data.oidc_enabled, godmode_enabled: data.godmode_enabled };
+}
+
+/**
+ * Exchanges god-mode credentials for a metahub-api JWT via
+ * `POST /api/v1/godmode/login`. The call is unauthenticated — we deliberately
+ * skip `apiFetch` so no stale Bearer token is attached.
+ *
+ * Throws ApiError on any non-2xx response. Callers should branch on
+ * `error.status` (401 → bad credentials, 404 → god-mode disabled server-side).
+ */
+export async function godmodeLogin(
+  username: string,
+  password: string
+): Promise<{ token: string }> {
+  const baseUrl = getApiBaseUrl();
+  const response = await fetch(`${baseUrl}/api/v1/godmode/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({ username, password }),
+  });
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new ApiError(text || response.statusText, response.status);
+  }
+  const data = (await response.json()) as { token?: string };
+  if (!data?.token) {
+    throw new ApiError("missing token in login response", 502);
+  }
+  return { token: data.token };
+}
+
+// ─── Profiles API ────────────────────────────────────────────────
+
+export interface ApiProfileRule {
+  id: number;
+  type: string;
+  op: string;
+  key: string;
+  value: string;
+}
+
+export interface ApiProfile {
+  id: number;
+  name: string;
+  tag: string;
+  label: string;
+  rules: ApiProfileRule[];
+}
+
+export interface ProfilesResponse {
+  profiles: ApiProfile[];
+}
+
+export function fetchProfiles() {
+  return apiFetch<ProfilesResponse>("/api/v1/profiles");
 }

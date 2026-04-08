@@ -1,9 +1,20 @@
 import { useSearchParams } from "react-router-dom";
-import { profiles } from "@/data/profiles";
+import { useQuery } from "@tanstack/react-query";
+import { fetchProfiles } from "@/lib/api";
+import { profiles as STATIC_PROFILES } from "@/data/profiles";
 
 export function ProfileSelector() {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedProfile = searchParams.get("profile") || "";
+
+  // Fetch profiles from the API; fall back to static profiles while loading or on error
+  const { data } = useQuery({
+    queryKey: ["profiles"],
+    queryFn: fetchProfiles,
+    initialData: { profiles: STATIC_PROFILES.map((p) => ({ id: 0, name: p.name, tag: "", label: p.description, rules: [] })) },
+  });
+
+  const profileList = data?.profiles ?? [];
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -32,7 +43,7 @@ export function ProfileSelector() {
         className="border-border bg-background text-foreground rounded-md border px-2 py-1 text-sm"
       >
         <option value="">All Profiles</option>
-        {profiles.map((p) => (
+        {profileList.map((p) => (
           <option key={p.name} value={p.name}>
             {p.name}
           </option>
