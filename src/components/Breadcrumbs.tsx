@@ -10,7 +10,7 @@ interface BreadcrumbsProps {
 }
 
 export function Breadcrumbs({ crumbs, profile, section = "collections" }: BreadcrumbsProps) {
-  const profileParam = profile ? `?profile=${profile}` : "";
+  const profileParam = profile ? `?profile=${encodeURIComponent(profile)}` : "";
   const base = `/${section}`;
 
   return (
@@ -21,21 +21,24 @@ export function Breadcrumbs({ crumbs, profile, section = "collections" }: Breadc
       >
         Home
       </Link>
-      {crumbs.map((crumb) => (
-        <span key={crumb.link || crumb.crumb} className="flex items-center gap-1">
-          <span className="text-muted-foreground">/</span>
-          {crumb.active ? (
-            <span className="text-foreground font-medium">{crumb.crumb}</span>
-          ) : (
-            <Link
-              to={`${base}/${crumb.link}${profileParam}`}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {crumb.crumb}
-            </Link>
-          )}
-        </span>
-      ))}
+      {crumbs.map((crumb, index) => {
+        const isLast = index === crumbs.length - 1;
+        return (
+          <span key={crumb.link || crumb.crumb} className="flex items-center gap-1">
+            <span className="text-muted-foreground">/</span>
+            {isLast ? (
+              <span className="text-foreground font-medium">{crumb.crumb}</span>
+            ) : (
+              <Link
+                to={`${base}/${crumb.link}${profileParam}`}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {crumb.crumb}
+              </Link>
+            )}
+          </span>
+        );
+      })}
     </nav>
   );
 }

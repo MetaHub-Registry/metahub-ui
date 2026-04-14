@@ -141,7 +141,7 @@ export interface CollectionNext {
 export interface CollectionListResponse {
   next: Record<string, CollectionNext>;
   bread_crumbs: BreadCrumb[];
-  slug_end: string;
+  slug_end: string | number;
 }
 
 export interface Manifest {
@@ -154,8 +154,11 @@ export interface Manifest {
     features?: string[];
   };
   size: number;
+  content_size?: number;
   registry: string;
+  upstream?: string;
   annotations?: Record<string, string>;
+  profiles?: string[];
 }
 
 export interface CollectionDetailResponse {
@@ -199,6 +202,14 @@ export interface OrasListing {
   artifact_count: number;
 }
 
+export interface OrasBlob {
+  digest: string;
+  media_type: string;
+  size: number;
+  title: string;
+  annotations: Record<string, string>;
+}
+
 export interface OrasArtifact {
   id: number;
   repo: string;
@@ -207,7 +218,7 @@ export interface OrasArtifact {
   artifact_type: string;
   annotations: Record<string, string>;
   subject?: Manifest;
-  blobs: Manifest[];
+  blobs: OrasBlob[];
 }
 
 export interface OrasListResponse {
@@ -223,10 +234,14 @@ export interface OrasArtifactResponse {
 
 // ─── Collections API calls ──────────────────────────────────────
 
-export function fetchCollections(repoPrefix: string) {
+export function fetchCollections(repoPrefix: string, profile?: string) {
+  const body: Record<string, string> = { repo: repoPrefix };
+  if (profile) {
+    body.profile = profile;
+  }
   return apiFetch<CollectionListResponse>("/api/v1/collections", {
     method: "POST",
-    body: JSON.stringify({ repo: repoPrefix }),
+    body: JSON.stringify(body),
   });
 }
 
@@ -404,4 +419,20 @@ export interface ProfilesResponse {
 
 export function fetchProfiles() {
   return apiFetch<ProfilesResponse>("/api/v1/profiles");
+}
+
+export interface ProfileDetailResponse {
+  id: number;
+  name: string;
+  tag: string;
+  label: string;
+  rules: ApiProfileRule[];
+  collection_count: number;
+  manifest_count: number;
+}
+
+export function fetchProfileDetail(label: string) {
+  return apiFetch<ProfileDetailResponse>(
+    `/api/v1/profiles/${encodeURIComponent(label)}`
+  );
 }
