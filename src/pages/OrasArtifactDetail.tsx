@@ -131,11 +131,11 @@ export function OrasArtifactDetail() {
         </div>
       )}
 
-      {/* Blobs */}
+      {/* Layers */}
       {artifact.blobs && artifact.blobs.length > 0 && (
         <div className="space-y-2">
           <h2 className="text-lg font-semibold">
-            Blobs
+            Layers
             <span className="text-muted-foreground text-base font-normal ml-2">
               ({artifact.blobs.length})
             </span>
@@ -144,13 +144,25 @@ export function OrasArtifactDetail() {
             {artifact.blobs.map((blob) => {
               const blobDigestShort = blob.digest.replace("sha256:", "").slice(0, 12);
               const sizeStr = blob.size ? formatBytes(blob.size) : "unknown size";
+              const hasTitle = blob.title && blob.title.length > 0;
               return (
                 <Card key={blob.digest}>
                   <CardHeader className="flex-row items-center justify-between gap-4 py-3">
                     <div className="flex items-center gap-3">
-                      <Badge variant="outline" className="font-mono text-xs">
-                        {blob.media_type}
-                      </Badge>
+                      {hasTitle ? (
+                        <>
+                          <span className="text-sm font-medium">
+                            {blob.title}
+                          </span>
+                          <Badge variant="outline" className="font-mono text-xs">
+                            {blob.media_type}
+                          </Badge>
+                        </>
+                      ) : (
+                        <Badge variant="outline" className="font-mono text-xs">
+                          {blob.media_type}
+                        </Badge>
+                      )}
                       <div className="flex items-center gap-1 font-mono text-xs">
                         <span className="text-muted-foreground">sha256:</span>
                         <span>{blobDigestShort}</span>

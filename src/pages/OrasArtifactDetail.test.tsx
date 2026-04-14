@@ -26,9 +26,22 @@ const mockArtifact = {
     {
       digest: "sha256:bbbbbbbb1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
       media_type: "application/vnd.cyclonedx+json",
-      platform: { os: "", architecture: "" },
       size: 2048,
-      registry: "",
+      title: "sbom.cdx.json",
+      annotations: { "org.opencontainers.image.title": "sbom.cdx.json" },
+    },
+  ],
+};
+
+const mockArtifactNoTitle = {
+  ...mockArtifact,
+  blobs: [
+    {
+      digest: "sha256:bbbbbbbb1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      media_type: "application/vnd.cyclonedx+json",
+      size: 2048,
+      title: "",
+      annotations: {},
     },
   ],
 };
@@ -87,7 +100,7 @@ describe("OrasArtifactDetail", () => {
     });
   });
 
-  it("renders blobs list", async () => {
+  it("renders layers list with file name when title is set", async () => {
     mockFetchOrasArtifact.mockResolvedValue({
       artifact: mockArtifact,
       bread_crumbs: [],
@@ -102,7 +115,28 @@ describe("OrasArtifactDetail", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Blobs")).toBeInTheDocument();
+      expect(screen.getByText("Layers")).toBeInTheDocument();
+      expect(screen.getByText("sbom.cdx.json")).toBeInTheDocument();
+      expect(screen.getByText("application/vnd.cyclonedx+json")).toBeInTheDocument();
+    });
+  });
+
+  it("renders layers list with mediaType when title is empty", async () => {
+    mockFetchOrasArtifact.mockResolvedValue({
+      artifact: mockArtifactNoTitle,
+      bread_crumbs: [],
+    });
+
+    renderWithProviders(<OrasArtifactDetail />, {
+      routerProps: {
+        initialEntries: [
+          "/oras/artifact?repo=qnib%2Ffeaturetest&type=application%2Fvnd.cyclonedx",
+        ],
+      },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Layers")).toBeInTheDocument();
       expect(screen.getByText("application/vnd.cyclonedx+json")).toBeInTheDocument();
     });
   });

@@ -23,7 +23,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { CopyButton } from "@/components/CopyButton";
-import { profiles } from "@/data/profiles";
+import { fetchProfiles } from "@/lib/api";
 import { toast } from "sonner";
 
 export function Settings() {
@@ -46,6 +46,12 @@ export function Settings() {
     queryKey: ["registry-tokens"],
     queryFn: fetchRegistryTokens,
   });
+
+  const { data: profilesData } = useQuery({
+    queryKey: ["profiles"],
+    queryFn: fetchProfiles,
+  });
+  const profileList = profilesData?.profiles ?? [];
 
   const createMutation = useMutation({
     mutationFn: (description: string) => createRegistryToken(description),
@@ -105,9 +111,9 @@ export function Settings() {
               className="border-border bg-background text-foreground rounded-md border px-2 py-1 text-sm"
             >
               <option value="">Default (generic)</option>
-              {profiles.map((p) => (
-                <option key={p.name} value={p.name}>
-                  {p.name}
+              {profileList.map((p) => (
+                <option key={p.label} value={p.label}>
+                  {p.label}
                 </option>
               ))}
             </select>

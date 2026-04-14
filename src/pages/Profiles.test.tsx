@@ -1,11 +1,34 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { screen } from "@testing-library/react";
 import { render } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Profiles } from "./Profiles";
-import { profiles } from "@/data/profiles";
+import { ProfileDetail } from "./ProfileDetail";
+
+// Mock the API — inline data to avoid hoisting issues
+vi.mock("@/lib/api", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/api")>();
+  return {
+    ...actual,
+    fetchProfiles: vi.fn().mockResolvedValue({
+      profiles: [
+        { id: 1, name: "", tag: "generic", label: "generic", rules: [{ id: 1, type: "plat", op: "eq", key: "os", value: "linux" }] },
+        { id: 2, name: "cpu", tag: "zen3", label: "cpu#zen3", rules: [{ id: 2, type: "anno", op: "eq", key: "org.supercontainers.hardware.cpu.target.microarch", value: "zen3" }] },
+      ],
+    }),
+    fetchProfileDetail: vi.fn().mockResolvedValue({
+      id: 2,
+      name: "cpu",
+      tag: "zen3",
+      label: "cpu#zen3",
+      rules: [{ id: 2, type: "anno", op: "eq", key: "org.supercontainers.hardware.cpu.target.microarch", value: "zen3" }],
+      collection_count: 3,
+      manifest_count: 7,
+    }),
+  };
+});
 
 function renderProfilesWithRoute(initialPath = "/profiles") {
   const queryClient = new QueryClient({
@@ -20,7 +43,7 @@ function renderProfilesWithRoute(initialPath = "/profiles") {
         <TooltipProvider>
           <Routes>
             <Route path="/profiles" element={<Profiles />} />
-            <Route path="/profiles/:name" element={<Profiles />} />
+            <Route path="/profiles/:label" element={<ProfileDetail />} />
           </Routes>
         </TooltipProvider>
       </MemoryRouter>
@@ -34,44 +57,27 @@ describe("Profiles", () => {
     expect(screen.getByText("Profiles")).toBeInTheDocument();
   });
 
-  it("renders all profiles from the static config", () => {
-    renderProfilesWithRoute("/profiles");
-
-    for (const profile of profiles) {
-      expect(screen.getByText(profile.name)).toBeInTheDocument();
-    }
+  it("renders profile detail view when label param is present", async () => {
+    renderProfilesWithRoute("/profiles/cpu%23zen3");
+    expect(await screen.findByText("Profile: cpu#zen3")).toBeInTheDocument();
   });
 
-  it("displays profile descriptions", () => {
-    renderProfilesWithRoute("/profiles");
-
-    for (const profile of profiles) {
-      expect(screen.getByText(profile.description)).toBeInTheDocument();
-    }
+  it("shows matching rules in detail view", async () => {
+    renderProfilesWithRoute("/profiles/cpu%23zen3");
+    expect(await screen.findByText("Matching Rules")).toBeInTheDocument();
   });
 
-  it("renders profile detail view when name param is present", () => {
-    renderProfilesWithRoute("/profiles/zen3");
-
-    expect(screen.getByText("Profile: zen3")).toBeInTheDocument();
-    expect(
-      screen.getByText("AMD Zen 3 CPU microarchitecture")
-    ).toBeInTheDocument();
-  });
-
-  it("shows matching rules in detail view", () => {
-    renderProfilesWithRoute("/profiles/zen3");
-
-    expect(screen.getByText("Matching Rules")).toBeInTheDocument();
-    expect(screen.getByText("cpu:zen3 eq true")).toBeInTheDocument();
-  });
-
-  it("shows link to browse collections with profile filter", () => {
-    renderProfilesWithRoute("/profiles/zen3");
-
-    const link = screen.getByText(
+  it("shows link to browse collections with profile filter", async () => {
+    renderProfilesWithRoute("/profiles/cpu%23zen3");
+    const link = await screen.findByText(
       /Browse collections filtered by this profile/
     );
     expect(link).toBeInTheDocument();
+  });
+
+  it("shows collection and manifest counts", async () => {
+    renderProfilesWithRoute("/profiles/cpu%23zen3");
+    expect(await screen.findByText("3")).toBeInTheDocument();
+    expect(await screen.findByText("7")).toBeInTheDocument();
   });
 });

@@ -24,6 +24,12 @@ vi.mock("@/lib/api", async (importOriginal) => {
     fetchRegistryTokens: vi.fn(),
     createRegistryToken: vi.fn(),
     deleteRegistryToken: vi.fn(),
+    fetchProfiles: vi.fn().mockResolvedValue({
+      profiles: [
+        { id: 1, name: "", tag: "generic", label: "generic", rules: [] },
+        { id: 2, name: "cpu", tag: "zen3", label: "cpu#zen3", rules: [] },
+      ],
+    }),
   };
 });
 
@@ -91,19 +97,24 @@ describe("Settings — Docker Login command", () => {
 
   it("appends /profile to login command when profile selected", async () => {
     renderSettings();
-    fireEvent.change(screen.getByRole("combobox"), { target: { value: "zen3" } });
+    // Wait for the profile options to load from the mock API
     await waitFor(() => {
-      expect(screen.getByText(/testuser\/zen3/)).toBeInTheDocument();
+      expect(screen.getByText("cpu#zen3")).toBeInTheDocument();
+    });
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "cpu#zen3" } });
+    await waitFor(() => {
+      const codeEl = screen.getByText(/docker login/);
+      expect(codeEl.textContent).toContain("cpu#zen3");
     });
   });
 
   it("removes profile suffix when cleared", async () => {
     renderSettings();
-    fireEvent.change(screen.getByRole("combobox"), { target: { value: "zen3" } });
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "cpu#zen3" } });
     fireEvent.change(screen.getByRole("combobox"), { target: { value: "" } });
     await waitFor(() => {
       const codeEl = screen.getByText(/docker login/);
-      expect(codeEl.textContent).not.toContain("/zen3");
+      expect(codeEl.textContent).not.toContain("cpu#zen3");
     });
   });
 
