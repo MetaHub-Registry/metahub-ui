@@ -26,6 +26,7 @@ vi.mock("@/lib/api", async (importOriginal) => {
       rules: [{ id: 2, type: "anno", op: "eq", key: "org.supercontainers.hardware.cpu.target.microarch", value: "zen3" }],
       collection_count: 3,
       manifest_count: 7,
+      manipulations: [],
     }),
   };
 });

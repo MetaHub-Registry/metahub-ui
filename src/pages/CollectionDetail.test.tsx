@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, fireEvent, within } from "@testing-library/react";
 import { render } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -179,5 +179,90 @@ describe("CollectionDetail", () => {
       expect(screen.getByText("Failed to load collection")).toBeInTheDocument();
       expect(screen.getByText("Not found")).toBeInTheDocument();
     });
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────
+// Expandable row + profile link + upstream  (collection-manifest-expand)
+// ───────────────────────────────────────────────────────────────────
+
+const expandData = {
+  collection: {
+    name: "qnib/expand",
+    tag: "latest",
+    manifests: [
+      {
+        digest: "sha256:aaaa1111bbbb2222cccc3333dddd4444eeee5555ffff6666",
+        media_type: "application/vnd.oci.image.manifest.v1+json",
+        platform: { os: "linux", architecture: "amd64" },
+        size: 12345,
+        registry: "docker.io",
+        upstream: "quay.io/qnib/expand:latest",
+        annotations: { "org.opencontainers.image.title": "expand" },
+        profiles: ["cpu#zen3"],
+        config: {
+          digest: "sha256:cfgcfgcfgcfgcfgcfgcfgcfgcfgcfgcfgcfgcfgcfgcfgcfg",
+          media_type: "application/vnd.oci.image.config.v1+json",
+          size: 999,
+        },
+        layers: [
+          {
+            digest: "sha256:lyr1lyr1lyr1lyr1lyr1lyr1lyr1lyr1lyr1lyr1lyr1lyr1",
+            media_type: "application/vnd.oci.image.layer.v1.tar+gzip",
+            size: 42,
+          },
+          {
+            digest: "sha256:lyr2lyr2lyr2lyr2lyr2lyr2lyr2lyr2lyr2lyr2lyr2lyr2",
+            media_type: "application/vnd.oci.image.layer.v1.tar+gzip",
+            size: 84,
+          },
+        ],
+      },
+    ],
+  },
+  repos: [],
+  bread_crumbs: [],
+};
+
+describe("CollectionDetail — expandable rows", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("renders upstream URL and a copy button when manifest.upstream is set", async () => {
+    mockFetchCollection.mockResolvedValue(expandData);
+    renderCollectionDetail();
+    await waitFor(() => {
+      expect(screen.getByText("quay.io/qnib/expand:latest")).toBeInTheDocument();
+    });
+  });
+
+  it("renders profile badges as links pointing at /profiles/:label", async () => {
+    mockFetchCollection.mockResolvedValue(expandData);
+    renderCollectionDetail();
+    await waitFor(() => {
+      const links = screen.getAllByTestId("profile-link");
+      expect(links.length).toBe(1);
+      expect(links[0]).toHaveAttribute("href", "/profiles/cpu%23zen3");
+    });
+  });
+
+  it("expands the row on click and reveals config + layers", async () => {
+    mockFetchCollection.mockResolvedValue(expandData);
+    renderCollectionDetail();
+    await waitFor(() => {
+      expect(screen.getByTestId("manifest-row")).toBeInTheDocument();
+    });
+    const row = screen.getByTestId("manifest-row");
+    // Initially collapsed: the "Config" heading is absent.
+    expect(within(row).queryByText("Config")).not.toBeInTheDocument();
+    const toggle = within(row).getByRole("button", { expanded: false });
+    fireEvent.click(toggle);
+    // Heading revealed after click.
+    expect(within(row).getByText("Config")).toBeInTheDocument();
+    expect(within(row).getByText("Layers (2)")).toBeInTheDocument();
+    expect(within(row).getByText("Annotations")).toBeInTheDocument();
+    // Content: short-form digest for the first layer.
+    expect(within(row).getByText("lyr1lyr1lyr1")).toBeInTheDocument();
   });
 });

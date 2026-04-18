@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchProfileDetail } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ManipulationCard } from "@/components/ManipulationCard";
 
 export function ProfileDetail() {
   const { label } = useParams<{ label: string }>();
@@ -86,6 +87,22 @@ export function ProfileDetail() {
             </p>
           )}
         </div>
+      </div>
+
+      {/* Manipulations */}
+      <div>
+        <h2 className="mb-2 text-lg font-semibold">Manipulations</h2>
+        {data.manipulations && data.manipulations.length > 0 ? (
+          <div className="space-y-2">
+            {data.manipulations.map((mp) => (
+              <ManipulationCard key={mp.label} manipulation={mp} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-sm">
+            No manipulations linked to this profile.
+          </p>
+        )}
       </div>
 
       <button

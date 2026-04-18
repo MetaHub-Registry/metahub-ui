@@ -1,7 +1,8 @@
 import { useState, useMemo } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchCollection, type Manifest } from "@/lib/api";
+import { ChevronDownIcon } from "lucide-react";
+import { fetchCollection, type Manifest, type ApiDescriptor } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader } from "@/components/ui/card";
@@ -179,6 +180,8 @@ function ManifestRow({
   highlighted: boolean;
   dimmed: boolean;
 }) {
+  const [expanded, setExpanded] = useState(false);
+
   const platformStr = [
     manifest.platform.os,
     manifest.platform.architecture,
@@ -192,41 +195,173 @@ function ManifestRow({
     ? formatBytes(manifest.size)
     : "unknown size";
 
+  const profiles = manifest.profiles ?? [];
+  const annotations = manifest.annotations ?? {};
+  const hasAnnotations = Object.keys(annotations).length > 0;
+  const hasConfig = !!manifest.config && manifest.config.digest !== "";
+  const hasLayers = !!manifest.layers && manifest.layers.length > 0;
+  const hasExpandable = hasConfig || hasAnnotations || hasLayers;
+
   return (
     <Card
+      data-testid="manifest-row"
       className={cn(
-        "transition-opacity",
+        "overflow-hidden transition-opacity",
         dimmed && "opacity-40",
         highlighted && "border-primary/30 bg-primary/5"
       )}
     >
-      <CardHeader className="flex-row items-center justify-between gap-4 py-3">
-        <div className="flex items-center gap-3">
-          <Badge variant={dimmed ? "outline" : "secondary"}>{platformStr}</Badge>
-          <div className="flex items-center gap-1 font-mono text-xs">
-            <span className="text-muted-foreground">sha256:</span>
-            <span>{digestShort}</span>
-            <CopyButton text={manifest.digest} />
-          </div>
-        </div>
-        <div className="flex items-center gap-3 text-sm">
-          <span className="text-muted-foreground">{sizeStr}</span>
-          {manifest.registry && (
-            <Badge variant="outline">{manifest.registry}</Badge>
-          )}
-          {manifest.platform.features &&
-            manifest.platform.features.length > 0 && (
-              <div className="flex gap-1">
-                {manifest.platform.features.map((f) => (
-                  <Badge key={f} variant="outline" className="text-xs">
-                    {f}
-                  </Badge>
-                ))}
+      <button
+        type="button"
+        aria-expanded={expanded}
+        onClick={() => setExpanded((v) => !v)}
+        disabled={!hasExpandable}
+        className={cn(
+          "w-full text-left",
+          hasExpandable ? "hover:bg-muted/30" : "cursor-default"
+        )}
+      >
+        <CardHeader className="flex-row items-center justify-between gap-4 py-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <Badge variant={dimmed ? "outline" : "secondary"}>{platformStr}</Badge>
+            <div className="flex items-center gap-1 font-mono text-xs">
+              <span className="text-muted-foreground">sha256:</span>
+              <span>{digestShort}</span>
+              <span onClick={(e) => e.stopPropagation()}>
+                <CopyButton text={manifest.digest} />
+              </span>
+            </div>
+            {manifest.upstream && (
+              <div className="flex items-center gap-1 font-mono text-xs text-muted-foreground">
+                <span>\u2190</span>
+                <span>{manifest.upstream}</span>
+                <span onClick={(e) => e.stopPropagation()}>
+                  <CopyButton text={manifest.upstream} />
+                </span>
               </div>
             )}
+            {profiles.map((prf) => (
+              <Link
+                key={prf}
+                to={`/profiles/${encodeURIComponent(prf)}`}
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex"
+                data-testid="profile-link"
+              >
+                <Badge
+                  variant="outline"
+                  className="cursor-pointer font-mono text-xs hover:bg-primary/10"
+                >
+                  {prf}
+                </Badge>
+              </Link>
+            ))}
+          </div>
+          <div className="flex items-center gap-3 text-sm">
+            <span className="text-muted-foreground">{sizeStr}</span>
+            {manifest.registry && (
+              <Badge variant="outline">{manifest.registry}</Badge>
+            )}
+            {manifest.platform.features &&
+              manifest.platform.features.length > 0 && (
+                <div className="flex gap-1">
+                  {manifest.platform.features.map((f) => (
+                    <Badge key={f} variant="outline" className="text-xs">
+                      {f}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            {hasExpandable && (
+              <ChevronDownIcon
+                className={cn(
+                  "size-4 transition-transform",
+                  expanded ? "rotate-180" : undefined
+                )}
+              />
+            )}
+          </div>
+        </CardHeader>
+      </button>
+      {expanded && hasExpandable && (
+        <div className="space-y-4 border-t px-4 py-4 text-sm">
+          {hasConfig && <ConfigBlock descriptor={manifest.config!} />}
+          {hasAnnotations && <AnnotationsBlock annotations={annotations} />}
+          {hasLayers && <LayersBlock layers={manifest.layers!} />}
         </div>
-      </CardHeader>
+      )}
     </Card>
+  );
+}
+
+function ConfigBlock({ descriptor }: { descriptor: ApiDescriptor }) {
+  const short = descriptor.digest.replace("sha256:", "").slice(0, 12);
+  return (
+    <section>
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Config
+      </h3>
+      <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
+        <span className="text-muted-foreground">sha256:</span>
+        <span>{short}</span>
+        <CopyButton text={descriptor.digest} />
+        <Badge variant="outline">{descriptor.media_type}</Badge>
+        <span className="text-muted-foreground">{formatBytes(descriptor.size)}</span>
+      </div>
+    </section>
+  );
+}
+
+function AnnotationsBlock({
+  annotations,
+}: {
+  annotations: Record<string, string>;
+}) {
+  return (
+    <section>
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Annotations
+      </h3>
+      <div className="rounded-md border overflow-hidden">
+        <table className="w-full text-xs">
+          <tbody>
+            {Object.entries(annotations).map(([k, v]) => (
+              <tr key={k} className="border-t first:border-t-0">
+                <td className="px-3 py-1 font-mono text-muted-foreground">{k}</td>
+                <td className="px-3 py-1 font-mono">{v}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function LayersBlock({ layers }: { layers: ApiDescriptor[] }) {
+  return (
+    <section>
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Layers ({layers.length})
+      </h3>
+      <ul className="space-y-1">
+        {layers.map((l, idx) => {
+          const short = l.digest.replace("sha256:", "").slice(0, 12);
+          return (
+            <li
+              key={`${l.digest}-${idx}`}
+              className="flex flex-wrap items-center gap-2 font-mono text-xs"
+            >
+              <span className="text-muted-foreground">sha256:</span>
+              <span>{short}</span>
+              <CopyButton text={l.digest} />
+              <Badge variant="outline">{l.media_type}</Badge>
+              <span className="text-muted-foreground">{formatBytes(l.size)}</span>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 
