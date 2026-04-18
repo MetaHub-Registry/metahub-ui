@@ -87,6 +87,42 @@ as `*.test.tsx` / `*.test.ts`.
 - Dev versioning with `-devN` suffix in package.json
 - SonarQube version auto-detection
 
+## 2026-04-18 (ui-and-manipulation session)
+
+### What changed
+- **`profile-detail-manipulations`**: `/profiles/:label` now renders a
+  Manipulations section below the rules list using a new reusable
+  `<ManipulationCard>` (collapsible, covers default + variants + the
+  legacy flat-layers form). `api.ts` gains matching interfaces.
+- **`collection-manifest-expand`**: `ManifestRow` inside
+  `CollectionDetail.tsx` became a collapsible card that reveals
+  config, annotations and layers inline on click. Profile badges are
+  now `<Link>`s to the profile detail page. Upstream (when present)
+  shows up with a copy button on the header line.
+- **Tests**: 3 new cases on `CollectionDetail.test.tsx` (upstream,
+  profile link navigation, expand reveal) plus a brand-new
+  `ProfileDetail.test.tsx` (empty state, extended shape, legacy
+  shape). Total suite: 223/223 green. `npm run build` passes.
+
+### Key files
+- `src/components/ManipulationCard.tsx` — new
+- `src/pages/ProfileDetail.tsx` — new Manipulations section
+- `src/pages/CollectionDetail.tsx` — expandable rows + profile links
+- `src/lib/api.ts` — `ApiDescriptor`, `ApiManipulation*` types;
+  extended `Manifest` and `ProfileDetailResponse`
+- `src/pages/CollectionDetail.test.tsx`,
+  `src/pages/ProfileDetail.test.tsx` (new)
+
+### Gotchas
+- `data-testid="manifest-row"` and `data-testid="profile-link"`
+  pinpoint the expandable row and the profile badge links in tests;
+  don't strip them.
+- Click handlers on `<CopyButton>` and profile `<Link>`s inside the
+  row use `stopPropagation` so they don't toggle the row.
+- SonarQube: this session did not run sonar for metahub-ui — the
+  `metahub-ui` project is not present on the reachable SonarQube
+  instances. Tests + build are the only gate.
+
 ## Known Issues
 
 - Collection leaf URLs use graph IDs (`/collection/773/tag/772`) —
