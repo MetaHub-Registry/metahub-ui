@@ -488,3 +488,17 @@ export function fetchProfileDetail(label: string) {
     `/api/v1/profiles/${encodeURIComponent(label)}`
   );
 }
+
+// VersionResponse is the shape returned by `GET /api/v1/version`.
+// Both fields are always present; empty strings are legitimate for
+// older images that predate the handler (the UI falls back to an
+// em-dash in that case so the operator sees a deterministic "not
+// reported" state rather than a crash).
+export interface VersionResponse {
+  api: string;
+  metalib: string;
+}
+
+export function fetchVersion() {
+  return apiFetch<VersionResponse>("/api/v1/version");
+}
