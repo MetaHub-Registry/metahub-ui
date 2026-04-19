@@ -144,6 +144,12 @@ export interface CollectionListResponse {
   slug_end: string | number;
 }
 
+export interface ApiDescriptor {
+  digest: string;
+  media_type: string;
+  size: number;
+}
+
 export interface Manifest {
   digest: string;
   media_type: string;
@@ -159,6 +165,8 @@ export interface Manifest {
   upstream?: string;
   annotations?: Record<string, string>;
   profiles?: string[];
+  config?: ApiDescriptor;
+  layers?: ApiDescriptor[];
 }
 
 export interface CollectionDetailResponse {
@@ -421,6 +429,49 @@ export function fetchProfiles() {
   return apiFetch<ProfilesResponse>("/api/v1/profiles");
 }
 
+export type ApiManipuCmdOp = "replace" | "prepend" | "append";
+
+export interface ApiManipuCommand {
+  op: ApiManipuCmdOp;
+  value: string[];
+}
+
+export interface ApiManipuLayer {
+  image?: string;
+  rule?: string;
+  upstream?: string;
+  /**
+   * Optional Python-style slice expression (e.g. "[1:]", "[0]",
+   * "[-1]") that trims which layers from the source image the
+   * manipulation actually appends at apply time. Absent or empty
+   * means "all layers".
+   */
+  select?: string;
+}
+
+export interface ApiManipuConfig {
+  env?: Record<string, string>;
+  workdir?: string;
+  user?: string;
+  volumes?: string[];
+  entrypoint?: ApiManipuCommand;
+  cmd?: ApiManipuCommand;
+  layers?: ApiManipuLayer[];
+}
+
+export interface ApiManipuVariant {
+  rule: string;
+  config: ApiManipuConfig;
+}
+
+export interface ApiManipulation {
+  id: number;
+  label: string;
+  default?: ApiManipuConfig;
+  variants?: ApiManipuVariant[];
+  layers?: ApiManipuLayer[];
+}
+
 export interface ProfileDetailResponse {
   id: number;
   name: string;
@@ -429,10 +480,25 @@ export interface ProfileDetailResponse {
   rules: ApiProfileRule[];
   collection_count: number;
   manifest_count: number;
+  manipulations: ApiManipulation[];
 }
 
 export function fetchProfileDetail(label: string) {
   return apiFetch<ProfileDetailResponse>(
     `/api/v1/profiles/${encodeURIComponent(label)}`
   );
+}
+
+// VersionResponse is the shape returned by `GET /api/v1/version`.
+// Both fields are always present; empty strings are legitimate for
+// older images that predate the handler (the UI falls back to an
+// em-dash in that case so the operator sees a deterministic "not
+// reported" state rather than a crash).
+export interface VersionResponse {
+  api: string;
+  metalib: string;
+}
+
+export function fetchVersion() {
+  return apiFetch<VersionResponse>("/api/v1/version");
 }

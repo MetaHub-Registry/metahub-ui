@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { VersionFooter } from "@/components/VersionFooter";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -180,7 +181,7 @@ export function Layout() {
       <footer className="border-border border-t py-4">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 text-xs text-muted-foreground">
           <span>&copy; {new Date().getFullYear()} Christian Kniep. All rights reserved.</span>
-          <span>v{__APP_VERSION__}</span>
+          <VersionFooter uiVersion={__APP_VERSION__} />
         </div>
       </footer>
     </div>
