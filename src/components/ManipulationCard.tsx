@@ -196,8 +196,9 @@ function LegacyLayerList({ layers }: { layers: ApiManipuLayer[] }) {
     <ul className="space-y-1">
       {layers.map((lyr, idx) => (
         <li
-          key={`${lyr.image ?? lyr.upstream ?? "layer"}-${lyr.rule ?? idx}`}
+          key={`${lyr.image ?? lyr.upstream ?? "layer"}-${lyr.rule ?? idx}-${lyr.select ?? ""}`}
           className="flex flex-wrap items-center gap-2 text-xs"
+          data-testid="manipu-layer"
         >
           {lyr.rule && (
             <Badge variant="outline" className="font-mono">
@@ -207,6 +208,15 @@ function LegacyLayerList({ layers }: { layers: ApiManipuLayer[] }) {
           {lyr.image && <span className="font-mono">{lyr.image}</span>}
           {!lyr.image && lyr.upstream && (
             <span className="font-mono text-muted-foreground">{lyr.upstream}</span>
+          )}
+          {lyr.select && (
+            <Badge
+              variant="secondary"
+              className="font-mono text-[10px]"
+              data-testid="manipu-layer-select"
+            >
+              select: {lyr.select}
+            </Badge>
           )}
         </li>
       ))}

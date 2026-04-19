@@ -440,6 +440,13 @@ export interface ApiManipuLayer {
   image?: string;
   rule?: string;
   upstream?: string;
+  /**
+   * Optional Python-style slice expression (e.g. "[1:]", "[0]",
+   * "[-1]") that trims which layers from the source image the
+   * manipulation actually appends at apply time. Absent or empty
+   * means "all layers".
+   */
+  select?: string;
 }
 
 export interface ApiManipuConfig {

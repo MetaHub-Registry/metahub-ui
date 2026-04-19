@@ -135,4 +135,30 @@ describe("ProfileDetail — manipulations section", () => {
     expect(screen.getByText("Layers (legacy form)")).toBeInTheDocument();
     expect(screen.getByText("quay.io/x:arm64")).toBeInTheDocument();
   });
+
+  it("renders a select-chip on layers that carry a slice expression", async () => {
+    mockFetch.mockResolvedValue({
+      ...baseResp,
+      manipulations: [
+        {
+          id: 11,
+          label: "layer/trim#1.0",
+          layers: [
+            { image: "quay.io/x:arm64", rule: "arch:arm64=true", select: "[1:]" },
+            { image: "quay.io/x:amd64", rule: "arch:amd64=true" },
+          ],
+        },
+      ],
+    } as never);
+    renderDetail();
+    await waitFor(() =>
+      expect(screen.getByText("layer/trim#1.0")).toBeInTheDocument()
+    );
+    fireEvent.click(screen.getByRole("button", { name: /layer\/trim#1\.0/ }));
+    // Chip is only rendered when `select` is set; one of two layers
+    // carries it, so exactly one chip must be present.
+    const chips = screen.getAllByTestId("manipu-layer-select");
+    expect(chips).toHaveLength(1);
+    expect(chips[0].textContent).toContain("select: [1:]");
+  });
 });
