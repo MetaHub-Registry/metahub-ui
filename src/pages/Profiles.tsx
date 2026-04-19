@@ -6,12 +6,6 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { fetchProfiles } from "@/lib/api";
 
 export function Profiles() {
@@ -46,37 +40,9 @@ export function Profiles() {
             }
           >
             <CardHeader className="gap-1 py-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-medium">
-                  {profile.label}
-                </CardTitle>
-                <Tooltip>
-                  <TooltipTrigger
-                    render={
-                      <div className="flex gap-1">
-                        {profile.rules.map((rule) => (
-                          <Badge
-                            key={`${rule.type}-${rule.key}`}
-                            variant="outline"
-                            className="font-mono text-xs"
-                          >
-                            {rule.type}:{rule.key}
-                          </Badge>
-                        ))}
-                      </div>
-                    }
-                  />
-                  <TooltipContent>
-                    <div className="space-y-1">
-                      {profile.rules.map((rule) => (
-                        <p key={`${rule.type}-${rule.key}-${rule.value}`} className="text-xs">
-                          {rule.type}:{rule.key} {rule.op} {rule.value}
-                        </p>
-                      ))}
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
+              <CardTitle className="text-base font-medium">
+                {profile.label}
+              </CardTitle>
               <CardDescription className="text-xs">
                 {profile.name}{profile.tag ? ` / ${profile.tag}` : ""}
               </CardDescription>
