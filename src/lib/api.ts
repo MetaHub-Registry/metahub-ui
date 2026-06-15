@@ -165,8 +165,19 @@ export interface Manifest {
   upstream?: string;
   annotations?: Record<string, string>;
   profiles?: string[];
+  // cpu_target is the structured CPU optimization parsed from the
+  // org.supercontainers.hardware.cpu.target* annotations (when present).
+  // Lets the UI distinguish otherwise-identical platform rows, e.g. a
+  // zen2-optimized amd64 image from a plain amd64 one.
+  cpu_target?: CPUTarget;
   config?: ApiDescriptor;
   layers?: ApiDescriptor[];
+}
+
+export interface CPUTarget {
+  kind?: string;
+  microarch?: string;
+  generic?: string;
 }
 
 export interface CollectionDetailResponse {
@@ -257,7 +268,8 @@ export function fetchCollection(
   repoName: string,
   tagName: string,
   collectionId?: number,
-  tagId?: number
+  tagId?: number,
+  profile?: string
 ) {
   const body: Record<string, string | number> = {};
   if (collectionId && tagId) {
@@ -266,6 +278,12 @@ export function fetchCollection(
   } else {
     body.repo_name = repoName;
     body.tag_name = tagName;
+  }
+  // When a profile is selected, ask the server to narrow the manifests
+  // to that profile. The handler (RepoGetOne) filters server-side; the
+  // UI no longer post-filters. Empty/undefined profile = no filter.
+  if (profile) {
+    body.profile = profile;
   }
   return apiFetch<CollectionDetailResponse>("/api/v1/collection", {
     method: "POST",

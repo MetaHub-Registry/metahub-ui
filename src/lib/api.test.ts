@@ -341,6 +341,41 @@ describe("Collections API functions", () => {
     const [, options] = mockFetch.mock.calls[0];
     expect(JSON.parse(options.body)).toEqual({ repo_name: "qnib/featuretest", tag_name: "arm64" });
   });
+
+  it("fetchCollection includes profile in body when provided", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+      json: () => Promise.resolve({ collection: {}, bread_crumbs: [] }),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    await fetchCollection("", "", 42, 7, "cpu#zen2");
+
+    const [, options] = mockFetch.mock.calls[0];
+    expect(JSON.parse(options.body)).toEqual({
+      collection_id: 42,
+      tag_id: 7,
+      profile: "cpu#zen2",
+    });
+  });
+
+  it("fetchCollection omits profile when empty", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+      json: () => Promise.resolve({ collection: {}, bread_crumbs: [] }),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    await fetchCollection("", "", 42, 7, "");
+
+    const [, options] = mockFetch.mock.calls[0];
+    expect(JSON.parse(options.body)).toEqual({ collection_id: 42, tag_id: 7 });
+    expect(JSON.parse(options.body)).not.toHaveProperty("profile");
+  });
 });
 
 describe("Auth API functions", () => {

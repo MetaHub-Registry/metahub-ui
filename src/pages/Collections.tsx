@@ -92,9 +92,13 @@ export function Collections() {
     ? selectedTagEntry[1].tag
     : "";
 
+  // Pass the selected profile so the server narrows the manifest set
+  // (RepoGetOne's `profile` filter). The profile is part of the query
+  // key so React Query refetches when the ProfileSelector changes it.
   const { data: detailData, isLoading: detailLoading } = useQuery({
-    queryKey: ["collection", repoName, tagName],
-    queryFn: () => fetchCollection(repoName, tagName),
+    queryKey: ["collection", repoName, tagName, selectedProfile],
+    queryFn: () =>
+      fetchCollection(repoName, tagName, undefined, undefined, selectedProfile),
     enabled: !!selectedTagEntry && !!repoName && !!tagName,
   });
 
@@ -193,6 +197,13 @@ export function Collections() {
             <p className="text-muted-foreground mt-1 text-sm">
               {collection.manifests.length} image
               {collection.manifests.length !== 1 ? "s" : ""} in this collection
+              {selectedProfile && (
+                <>
+                  {" "}
+                  included in the{" "}
+                  <span className="font-medium">{selectedProfile}</span> index
+                </>
+              )}
             </p>
           </div>
           <ProfileSelector />
@@ -218,11 +229,19 @@ export function Collections() {
           ))}
         </div>
 
-        {/* Manifest List */}
+        {/* Manifest List — when a profile is selected the server
+            returns only the images served under it (RepoGetOne's
+            `profile` filter); the UI renders the response verbatim. */}
         <div className="grid gap-2">
           {sortedManifests.map((manifest) => (
             <ManifestRow key={manifest.digest} manifest={manifest} />
           ))}
+          {selectedProfile && collection.manifests.length === 0 && (
+            <p className="text-muted-foreground py-6 text-center text-sm">
+              No images in this collection match the{" "}
+              <span className="font-mono">{selectedProfile}</span> profile.
+            </p>
+          )}
         </div>
       </div>
     );
