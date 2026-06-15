@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { screen, fireEvent, waitFor } from "@testing-library/react";
 import { renderWithProviders } from "@/test/test-utils";
 import { Collections } from "./Collections";
+import type { CollectionListResponse } from "@/lib/api";
 
 // Mock API
 vi.mock("@/lib/api", async () => {
@@ -9,11 +10,13 @@ vi.mock("@/lib/api", async () => {
   return {
     ...actual,
     fetchCollections: vi.fn(),
+    fetchCollection: vi.fn(),
   };
 });
 
-import { fetchCollections } from "@/lib/api";
+import { fetchCollections, fetchCollection } from "@/lib/api";
 const mockFetchCollections = vi.mocked(fetchCollections);
+const mockFetchCollection = vi.mocked(fetchCollection);
 
 describe("Collections", () => {
   beforeEach(() => {
@@ -266,6 +269,102 @@ describe("Collections", () => {
     await waitFor(() => {
       expect(screen.getByText("qnib")).toBeInTheDocument();
       expect(screen.getByLabelText("Breadcrumb")).toBeInTheDocument();
+    });
+  });
+
+  // ─── Profile filter on the leaf (tag) detail view ───────────────
+  // Reaching /collections/qnib/ftest/latest resolves to a tag, which
+  // triggers the inline collection-detail view inside Collections.tsx.
+  // That view must forward the selected profile to fetchCollection so
+  // the SERVER filters the manifests (RepoGetOne). Regression for
+  // "UI shows all manifests when filtered via profile".
+  function mockLeafResolution() {
+    // Full path (qnib/ftest/latest) returns empty -> triggers parent lookup.
+    // Parent path (qnib/ftest) returns a `latest` leaf entry.
+    mockFetchCollections.mockImplementation(
+      async (
+        repoPrefix: string,
+        _profile?: string
+      ): Promise<CollectionListResponse> => {
+        if (repoPrefix === "qnib/ftest") {
+          return {
+            next: {
+              latest: {
+                repo: "qnib/ftest",
+                tag: "latest",
+                collection_id: 34,
+                tag_id: 31,
+                collection_count: 1,
+                manifest_count: 4,
+              },
+            },
+            bread_crumbs: [],
+            slug_end: 1,
+          };
+        }
+        return { next: {}, bread_crumbs: [], slug_end: "" };
+      }
+    );
+  }
+
+  it("forwards the selected profile to the detail fetch on a tag URL", async () => {
+    mockLeafResolution();
+    mockFetchCollection.mockResolvedValue({
+      collection: { name: "qnib/ftest", tag: "latest", manifests: [] },
+      repos: [],
+      bread_crumbs: [],
+    });
+
+    renderWithProviders(<Collections />, {
+      routerProps: {
+        initialEntries: ["/collections/qnib/ftest/latest?profile=cpu%23zen2"],
+      },
+    });
+
+    await waitFor(() => {
+      expect(mockFetchCollection).toHaveBeenCalledWith(
+        "qnib/ftest",
+        "latest",
+        undefined,
+        undefined,
+        "cpu#zen2"
+      );
+    });
+  });
+
+  it("renders only the server-filtered manifests on a tag URL", async () => {
+    mockLeafResolution();
+    // Server returns just the single zen2 manifest (already filtered).
+    mockFetchCollection.mockResolvedValue({
+      collection: {
+        name: "qnib/ftest",
+        tag: "latest",
+        manifests: [
+          {
+            digest: "sha256:zen2only",
+            media_type: "application/vnd.oci.image.manifest.v1+json",
+            platform: { os: "linux", architecture: "amd64" },
+            size: 100,
+            registry: "",
+            profiles: ["cpu#zen2"],
+          },
+        ],
+      },
+      repos: [],
+      bread_crumbs: [],
+    });
+
+    renderWithProviders(<Collections />, {
+      routerProps: {
+        initialEntries: ["/collections/qnib/ftest/latest?profile=cpu%23zen2"],
+      },
+    });
+
+    await waitFor(() => {
+      // Exactly one image rendered, matching the server-filtered count.
+      expect(
+        screen.getByText(/1 image .*included in the/)
+      ).toBeInTheDocument();
     });
   });
 });
