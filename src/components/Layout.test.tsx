@@ -45,6 +45,17 @@ describe("Layout — unauthenticated", () => {
     expect(screen.getAllByText("Profiles").length).toBeGreaterThan(0);
   });
 
+  it("renders a Docs link pointing at the docs site", () => {
+    renderLayout();
+    const docsLinks = screen.getAllByRole("link", { name: "Docs" });
+    expect(docsLinks.length).toBeGreaterThan(0);
+    expect(docsLinks[0]).toHaveAttribute(
+      "href",
+      "https://docs.metahub-registry.org"
+    );
+    expect(docsLinks[0]).toHaveAttribute("target", "_blank");
+  });
+
   it("shows Login button when not authenticated", () => {
     renderLayout();
     expect(screen.getByText("Login")).toBeInTheDocument();
