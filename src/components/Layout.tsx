@@ -12,7 +12,22 @@ const navLinks = [
   { to: "/profiles", label: "Profiles" },
 ];
 
+// The docs site is served on the `docs.` sibling of whatever host serves the
+// frontend (e.g. frontend.dev.example.com -> docs.dev.example.com,
+// frontend.metahub-registry.org -> docs.metahub-registry.org), so derive it
+// from the current location rather than hardcoding a per-stack URL.
+function getDocsUrl(): string {
+  if (typeof window !== "undefined") {
+    const { protocol, hostname } = window.location;
+    if (hostname.startsWith("frontend.")) {
+      return `${protocol}//${hostname.replace(/^frontend\./, "docs.")}`;
+    }
+  }
+  return "https://docs.metahub-registry.org";
+}
+
 export function Layout() {
+  const docsUrl = getDocsUrl();
   const { isAuthenticated, user, logout } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -74,6 +89,14 @@ export function Layout() {
                 {link.label}
               </Link>
             ))}
+            <a
+              href={docsUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="text-muted-foreground hover:text-foreground rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+            >
+              Docs
+            </a>
           </nav>
 
           {/* Spacer (desktop only) */}
@@ -129,6 +152,15 @@ export function Layout() {
                   {link.label}
                 </Link>
               ))}
+              <a
+                href={docsUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-muted-foreground hover:text-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors"
+              >
+                Docs
+              </a>
               {isAuthenticated && user ? (
                 <>
                   <Link
