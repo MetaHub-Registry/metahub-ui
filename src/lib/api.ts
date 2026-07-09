@@ -301,6 +301,95 @@ export function fetchOrasArtifact(repo: string, artifactType: string) {
   return apiFetch<OrasArtifactResponse>(`/api/v1/oras/artifact?${params.toString()}`);
 }
 
+// ─── Models API ─────────────────────────────────────────────────
+// A model is a `model/<name>` manipulation produced by `metahub-admin
+// repackage`. Its repackaged model-layer images are excluded from collections
+// and surfaced in the Models tab instead.
+
+export interface ModelImageRef {
+  repo: string; // e.g. models/qwen3-8b-layer
+  tag: string; // quantization tag, e.g. q8-kxl
+  digest: string;
+  size?: number; // model-layer tar blob size in bytes (the model weight)
+}
+
+export interface ModelSourceArtifact {
+  repo: string; // e.g. e2e-models/e2e-gguf35
+  digest: string;
+}
+
+export interface ModelListing {
+  name: string; // <name> from the model/<name> label
+  label: string; // full manipulation label, model/<name>
+  profiles: string[]; // VRAM profile labels that inject the model
+  images: ModelImageRef[]; // repackaged model-layer image variant(s)
+  total_size?: number; // sum of the distinct quantizations' sizes
+  // Source ORAS artifact linked via the model-layer image's OCI subject
+  // reference; absent for models repackaged before subject refs were emitted.
+  source_artifact?: ModelSourceArtifact;
+}
+
+export interface ModelListResponse {
+  models: ModelListing[];
+}
+
+// ModelProfileConfig is the runtime config a publisher pushed for a model under a
+// hardware profile (the `config/<name>` manipulation): the config image and the
+// in-image dir the base image reads it from (QNIB_MODEL_CONFIG_DIR).
+export interface ModelProfileConfig {
+  profile: string; // profile label, e.g. vram#12gb
+  repo?: string; // config image repo, models/<name>-config
+  tag?: string; // quantization tag
+  digest?: string;
+  config_dir?: string; // QNIB_MODEL_CONFIG_DIR
+}
+
+// ModelComposition is a runnable bundle auto-derived from a model's referrers: a
+// config artefact (subject→a quant) + its {profile, runtime, quant} annotations
+// and the config image it repackages into. The runtime is the application
+// container the config names.
+export interface ModelComposition {
+  profile?: string;
+  quant?: string;
+  runtime?: string;
+  runtime_image?: string; // resolved runtime image ref (from the registry)
+  config_repo?: string;
+  config_tag?: string;
+  config_digest?: string;
+}
+
+// ModelDetail is the card payload for one model (GET /api/v1/models/:ref): every
+// quantization grouped under it (layer image + size), the per-profile configs,
+// the compositions (referrers-derived), the profiles it is served under, and the
+// source ORAS artifact.
+export interface ModelDetail {
+  name: string;
+  label: string;
+  profiles: string[];
+  quantizations: ModelImageRef[];
+  configs: ModelProfileConfig[];
+  compositions: ModelComposition[];
+  total_size?: number;
+  source_artifact?: ModelSourceArtifact;
+}
+
+export interface ModelDetailResponse {
+  model: ModelDetail;
+}
+
+export function fetchModels() {
+  return apiFetch<ModelListResponse>("/api/v1/models");
+}
+
+export function fetchModel(ref: string) {
+  // Model refs are org-qualified (`qnib/minicpm5`) and the API route is
+  // path-segmented (/api/v1/models/<org>/<name>). Encode each segment but KEEP
+  // the `/` separators — encodeURIComponent(ref) turns `/` into %2F, which the
+  // API 307-redirects (Location = the decoded path), and the card fails to load.
+  const path = ref.split("/").map(encodeURIComponent).join("/");
+  return apiFetch<ModelDetailResponse>(`/api/v1/models/${path}`);
+}
+
 export function fetchSession() {
   return apiFetch<UserSession>("/api/v1/protected/session");
 }
@@ -519,4 +608,20 @@ export interface VersionResponse {
 
 export function fetchVersion() {
   return apiFetch<VersionResponse>("/api/v1/version");
+}
+
+// ─── Config blob content ─────────────────────────────────────────
+// Fetches a model config layer's text content via the API proxy endpoint
+// (GET /api/v1/manifest/blob-content?repo=&ref=) which uses API JWT auth,
+// avoiding the separate OCI Bearer auth flow the browser cannot perform.
+
+export async function fetchConfigBlobContent(
+  repo: string,
+  ref: string
+): Promise<string> {
+  const params = new URLSearchParams({ repo, ref });
+  const res = await apiFetch<{ content: string }>(
+    `/api/v1/manifest/blob-content?${params.toString()}`
+  );
+  return res.content;
 }
