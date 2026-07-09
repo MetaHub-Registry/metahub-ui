@@ -6,6 +6,8 @@ import { Landing } from "@/pages/Landing";
 import { Login } from "@/pages/Login";
 import { Callback } from "@/pages/Callback";
 import { Collections } from "@/pages/Collections";
+import { Models } from "@/pages/Models";
+import { ModelDetail } from "@/pages/ModelDetail";
 import { OrasArtifacts } from "@/pages/OrasArtifacts";
 import { OrasArtifactDetail } from "@/pages/OrasArtifactDetail";
 import { Profiles } from "@/pages/Profiles";
@@ -23,6 +25,8 @@ function App() {
           <Route path="/profile" element={<Callback />} />
           <Route path="/collections" element={<Collections />} />
           <Route path="/collections/*" element={<Collections />} />
+          <Route path="/models" element={<Models />} />
+          <Route path="/models/:ref" element={<ModelDetail />} />
           <Route path="/oras" element={<OrasArtifacts />} />
           <Route path="/oras/*" element={<OrasArtifacts />} />
           <Route path="/oras/artifact" element={<OrasArtifactDetail />} />
