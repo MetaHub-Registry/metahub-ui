@@ -1,4 +1,9 @@
-## ADDED Requirements
+# oras-api-client Specification
+
+## Purpose
+Frontend API client for the ORAS artifact endpoints.
+
+## Requirements
 
 ### Requirement: fetchOrasArtifacts API function
 The `src/lib/api.ts` module SHALL export a `fetchOrasArtifacts(repoPrefix: string)` function that calls `GET /api/v1/oras` with the given prefix as a query parameter and returns an `OrasListResponse`.

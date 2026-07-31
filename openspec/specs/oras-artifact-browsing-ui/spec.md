@@ -1,4 +1,9 @@
-## ADDED Requirements
+# oras-artifact-browsing-ui Specification
+
+## Purpose
+Web UI for browsing ORAS artifacts — listings, detail, and layers.
+
+## Requirements
 
 ### Requirement: ORAS artifacts browse page
 The application SHALL provide an `OrasArtifacts` page at routes `/oras` and `/oras/*` that navigates the ORAS artifact repo tree, mirroring the structure of the `Collections` page.
