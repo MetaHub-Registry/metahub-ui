@@ -162,3 +162,75 @@ describe("ProfileDetail — manipulations section", () => {
     expect(chips[0].textContent).toContain("select: [1:]");
   });
 });
+
+describe("ProfileDetail — header, stats, rules, browse link (task 4.5)", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("renders the profile label heading and name/tag subtitle", async () => {
+    mockFetch.mockResolvedValue({ ...baseResp, manipulations: [] } as never);
+    renderDetail();
+    await waitFor(() =>
+      expect(screen.getByText("Profile: cpu#zen3")).toBeInTheDocument()
+    );
+    expect(screen.getByText("cpu / zen3")).toBeInTheDocument();
+  });
+
+  it("renders collection and manifest counts from the detail payload", async () => {
+    mockFetch.mockResolvedValue({ ...baseResp, manipulations: [] } as never);
+    renderDetail();
+    await waitFor(() =>
+      expect(screen.getByText("Profile: cpu#zen3")).toBeInTheDocument()
+    );
+    expect(screen.getByText("Collections")).toBeInTheDocument();
+    expect(screen.getByText("3")).toBeInTheDocument();
+    expect(screen.getByText("Manifests")).toBeInTheDocument();
+    expect(screen.getByText("7")).toBeInTheDocument();
+  });
+
+  it("renders matching rules as badges", async () => {
+    mockFetch.mockResolvedValue({ ...baseResp, manipulations: [] } as never);
+    renderDetail();
+    await waitFor(() =>
+      expect(screen.getByText("Matching Rules")).toBeInTheDocument()
+    );
+    expect(
+      screen.getByText(/anno:org\.supercontainers\.hardware\.cpu\.target\.microarch eq zen3/)
+    ).toBeInTheDocument();
+  });
+
+  it("states when a profile defines no rules", async () => {
+    mockFetch.mockResolvedValue({
+      ...baseResp,
+      rules: [],
+      manipulations: [],
+    } as never);
+    renderDetail();
+    await waitFor(() =>
+      expect(screen.getByText("No rules defined for this profile.")).toBeInTheDocument()
+    );
+  });
+
+  it("links to the profile-filtered collections view", async () => {
+    mockFetch.mockResolvedValue({ ...baseResp, manipulations: [] } as never);
+    renderDetail();
+    // The button text ends with an arrow entity (&rarr;), so match loosely.
+    await waitFor(() =>
+      expect(
+        screen.getByText(/Browse collections filtered by this profile/)
+      ).toBeInTheDocument()
+    );
+    const link = screen
+      .getByText(/Browse collections filtered by this profile/)
+      .closest("button");
+    expect(link).not.toBeNull();
+  });
+
+  it("shows the error state on API failure", async () => {
+    mockFetch.mockRejectedValue(new Error("404: profile not found"));
+    renderDetail();
+    await waitFor(() => {
+      expect(screen.getByText("Failed to load profile")).toBeInTheDocument();
+      expect(screen.getByText("404: profile not found")).toBeInTheDocument();
+    });
+  });
+});
