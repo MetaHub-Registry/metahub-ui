@@ -367,4 +367,179 @@ describe("Collections", () => {
       ).toBeInTheDocument();
     });
   });
+
+  // ─── Name-based collection detail URLs (task 2.6) ───────────────
+  // Clicking a tag navigates to /collections/<repo>/<tag> (name-based),
+  // never the removed /collection/:id/tag/:tagId route. The profile
+  // query string rides along, URL-encoded.
+  function mockTagListing() {
+    // At /collections (prefix ""): one repo entry carrying a tag →
+    // rendered as a clickable tag card. Any deeper prefix behaves like
+    // mockLeafResolution: full path empty, parent returns the leaf.
+    mockFetchCollections.mockImplementation(
+      async (
+        repoPrefix: string
+      ): Promise<CollectionListResponse> => {
+        if (repoPrefix === "") {
+          return {
+            next: {
+              ftest: {
+                repo: "qnib/ftest",
+                tag: "latest",
+                collection_id: 34,
+                tag_id: 31,
+                collection_count: 1,
+                manifest_count: 4,
+              },
+            },
+            bread_crumbs: [],
+            slug_end: "",
+          };
+        }
+        if (repoPrefix === "qnib/ftest") {
+          return {
+            next: {
+              latest: {
+                repo: "qnib/ftest",
+                tag: "latest",
+                collection_id: 34,
+                tag_id: 31,
+                collection_count: 1,
+                manifest_count: 4,
+              },
+            },
+            bread_crumbs: [],
+            slug_end: 1,
+          };
+        }
+        return { next: {}, bread_crumbs: [], slug_end: "" };
+      }
+    );
+  }
+
+  it("navigates to the name-based URL when a tag is clicked", async () => {
+    mockTagListing();
+    mockFetchCollection.mockResolvedValue({
+      collection: { name: "qnib/ftest", tag: "latest", manifests: [] },
+      repos: [],
+      bread_crumbs: [],
+    });
+
+    renderWithProviders(<Collections />, {
+      routerProps: { initialEntries: ["/collections"] },
+    });
+
+    // Tag entries render as a "repo:tag" card title (split across spans).
+    await waitFor(() => {
+      expect(screen.getByText("qnib/ftest")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("qnib/ftest"));
+
+    // The navigation must land on the name-based URL and trigger the
+    // detail fetch by (repo, tag) — the /collection/:id route is gone.
+    await waitFor(() => {
+      expect(mockFetchCollection).toHaveBeenCalledWith(
+        "qnib/ftest",
+        "latest",
+        undefined,
+        undefined,
+        ""
+      );
+    });
+  });
+
+  it("carries the profile query through navigation, URL-encoded", async () => {
+    mockTagListing();
+    mockFetchCollection.mockResolvedValue({
+      collection: { name: "qnib/ftest", tag: "latest", manifests: [] },
+      repos: [],
+      bread_crumbs: [],
+    });
+
+    renderWithProviders(<Collections />, {
+      routerProps: { initialEntries: ["/collections?profile=cpu%23zen2"] },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("qnib/ftest")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("qnib/ftest"));
+
+    await waitFor(() => {
+      expect(mockFetchCollection).toHaveBeenCalledWith(
+        "qnib/ftest",
+        "latest",
+        undefined,
+        undefined,
+        "cpu#zen2"
+      );
+    });
+  });
+
+  // ─── Manifest cards (task 3.4) ──────────────────────────────────
+  // ManifestRow renders the API-provided `profiles` field as badges —
+  // no client-side profile matching.
+  it("renders profile badges from the API-provided profiles field", async () => {
+    mockLeafResolution();
+    mockFetchCollection.mockResolvedValue({
+      collection: {
+        name: "qnib/ftest",
+        tag: "latest",
+        manifests: [
+          {
+            digest: "sha256:withprofiles",
+            media_type: "application/vnd.oci.image.manifest.v1+json",
+            platform: { os: "linux", architecture: "amd64" },
+            size: 100,
+            registry: "",
+            profiles: ["cpu#zen2", "cpu#zen3"],
+          },
+        ],
+      },
+      repos: [],
+      bread_crumbs: [],
+    });
+
+    renderWithProviders(<Collections />, {
+      routerProps: { initialEntries: ["/collections/qnib/ftest/latest"] },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Profiles:")).toBeInTheDocument();
+    });
+    expect(screen.getByText("cpu#zen2")).toBeInTheDocument();
+    expect(screen.getByText("cpu#zen3")).toBeInTheDocument();
+  });
+
+  it("omits the Profiles row when a manifest has none", async () => {
+    mockLeafResolution();
+    mockFetchCollection.mockResolvedValue({
+      collection: {
+        name: "qnib/ftest",
+        tag: "latest",
+        manifests: [
+          {
+            digest: "sha256:noprofiles",
+            media_type: "application/vnd.oci.image.manifest.v1+json",
+            platform: { os: "linux", architecture: "amd64" },
+            size: 100,
+            registry: "",
+          },
+        ],
+      },
+      repos: [],
+      bread_crumbs: [],
+    });
+
+    renderWithProviders(<Collections />, {
+      routerProps: { initialEntries: ["/collections/qnib/ftest/latest"] },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/1 image/)).toBeInTheDocument();
+    });
+    expect(screen.queryByText("Profiles:")).not.toBeInTheDocument();
+  });
 });

@@ -53,4 +53,38 @@ describe("ProfileSelector", () => {
     fireEvent.change(select, { target: { value: "" } });
     expect(select.value).toBe("");
   });
+
+  // ─── Label-not-name display (task 5.3) ──────────────────────────
+  // Dropdown options must show the profile's *label* (e.g. "cpu#zen3"),
+  // never its bare name ("cpu") — two cpu profiles would be
+  // indistinguishable and the value wouldn't resolve server-side.
+  it("lists option text by label, not name", async () => {
+    renderWithProviders(<ProfileSelector />, {
+      routerProps: { initialEntries: ["/collections"] },
+    });
+    await waitFor(() => {
+      expect(screen.getByText("cpu#zen3")).toBeInTheDocument();
+      expect(screen.getByText("cpu#skylake")).toBeInTheDocument();
+    });
+    // The bare names must not appear as options — only labels.
+    const select = screen.getByLabelText("Profile:") as HTMLSelectElement;
+    const optionTexts = Array.from(select.options).map((o) => o.textContent);
+    expect(optionTexts).toContain("generic");
+    expect(optionTexts).toContain("cpu#zen3");
+    expect(optionTexts).toContain("cpu#skylake");
+    expect(optionTexts).not.toContain("cpu");
+  });
+
+  it("uses the label as the option value", async () => {
+    renderWithProviders(<ProfileSelector />, {
+      routerProps: { initialEntries: ["/collections"] },
+    });
+    await waitFor(() => {
+      expect(screen.getByText("cpu#skylake")).toBeInTheDocument();
+    });
+    const select = screen.getByLabelText("Profile:") as HTMLSelectElement;
+    const values = Array.from(select.options).map((o) => o.value);
+    expect(values).toContain("cpu#skylake");
+    expect(values).not.toContain("skylake");
+  });
 });

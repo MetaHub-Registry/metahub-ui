@@ -17,6 +17,7 @@ import {
   createRegistryToken,
   deleteRegistryToken,
   fetchProfiles,
+  fetchProfileDetail,
   fetchAuthConfig,
   godmodeLogin,
 } from "./api";
@@ -311,6 +312,40 @@ describe("Collections API functions", () => {
     expect(JSON.parse(options.body)).toEqual({ repo: "qnib/featuretest" });
   });
 
+  it("fetchCollections includes profile in body when provided", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+      json: () => Promise.resolve({ next: {}, bread_crumbs: [], slug_end: 0 }),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    await fetchCollections("qnib/featuretest", "cpu#zen2");
+
+    const [, options] = mockFetch.mock.calls[0];
+    expect(JSON.parse(options.body)).toEqual({
+      repo: "qnib/featuretest",
+      profile: "cpu#zen2",
+    });
+  });
+
+  it("fetchCollections omits profile when not provided", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+      json: () => Promise.resolve({ next: {}, bread_crumbs: [], slug_end: 0 }),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    await fetchCollections("qnib/featuretest");
+
+    const [, options] = mockFetch.mock.calls[0];
+    expect(JSON.parse(options.body)).toEqual({ repo: "qnib/featuretest" });
+    expect(JSON.parse(options.body)).not.toHaveProperty("profile");
+  });
+
   it("fetchCollection by IDs sends collection_id and tag_id", async () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
@@ -501,6 +536,62 @@ describe("Profiles API functions", () => {
     const result = await fetchProfiles();
     expect(result.profiles).toHaveLength(1);
     expect(result.profiles[0].name).toBe("generic");
+  });
+
+  it("fetchProfileDetail sends GET to /api/v1/profiles/:label with URL-encoded label", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+      json: () =>
+        Promise.resolve({
+          id: 2,
+          name: "cpu",
+          tag: "zen2",
+          label: "cpu#zen2",
+          rules: [],
+          collection_count: 0,
+          manifest_count: 0,
+          manipulations: [],
+        }),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    await fetchProfileDetail("cpu#zen2");
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    const [url] = mockFetch.mock.calls[0];
+    // The label's '#' must be percent-encoded so it is not read as a
+    // URL fragment.
+    expect(url).toBe("/api/v1/profiles/cpu%23zen2");
+  });
+
+  it("fetchProfileDetail returns the parsed detail payload", async () => {
+    const payload = {
+      id: 2,
+      name: "cpu",
+      tag: "zen2",
+      label: "cpu#zen2",
+      rules: [
+        { id: 2, type: "anno", op: "eq", key: "hw.microarch", value: "zen2" },
+      ],
+      collection_count: 3,
+      manifest_count: 7,
+      manipulations: [],
+    };
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+      json: () => Promise.resolve(payload),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const result = await fetchProfileDetail("cpu#zen2");
+    expect(result.label).toBe("cpu#zen2");
+    expect(result.collection_count).toBe(3);
+    expect(result.manifest_count).toBe(7);
+    expect(result.rules).toHaveLength(1);
   });
 });
 

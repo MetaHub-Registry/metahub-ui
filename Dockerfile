@@ -1,5 +1,8 @@
 # Stage 1: Build
-FROM node:lts-alpine AS build
+# Pinned to $BUILDPLATFORM: the JS build is arch-independent and runs natively
+# on the build agent (no QEMU). The per-arch nginx:alpine runtime only COPYs
+# static output.
+FROM --platform=$BUILDPLATFORM node:lts-alpine AS build
 
 WORKDIR /app
 
