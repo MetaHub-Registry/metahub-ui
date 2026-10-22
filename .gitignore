@@ -6,14 +6,12 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
 node_modules
 dist
 dist-ssr
 coverage
 .scannerwork
 *.local
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -25,3 +23,6 @@ coverage
 *.sln
 *.sw?
 .env
+openspec/changes/
+agent.compose.yaml
+agent.compose.lock
