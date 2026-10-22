@@ -19,5 +19,20 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // The public fast lane gates lint errors. These three rules have a
+      // known pre-existing baseline (generated shadcn components, older
+      // effect patterns); keep them visible as warnings and tighten them
+      // incrementally rather than hiding them. See openspec add-public-ci.
+      'react-refresh/only-export-components': 'warn',
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/preserve-manual-memoization': 'warn',
+      // `_profile` is the conventional marker for an intentionally unused
+      // callback argument.
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+    },
   },
 ])

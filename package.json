@@ -1,6 +1,7 @@
 {
   "name": "metahub-ui",
   "private": true,
+  "license": "Apache-2.0",
   "version": "0.5.0-dev1",
   "type": "module",
   "scripts": {
