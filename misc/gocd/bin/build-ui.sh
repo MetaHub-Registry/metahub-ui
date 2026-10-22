@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-HARBOR_REG="${HARBOR_REG:-harbor.example.com}"
+HARBOR_REG="${HARBOR_REG:?HARBOR_REG must be set}"
 
 echo "> Login to ${HARBOR_REG} as 'robot\$good'"
 echo "HARBOR_TOKEN length: $(echo ${HARBOR_TOKEN}|wc -c)"
