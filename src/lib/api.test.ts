@@ -346,22 +346,6 @@ describe("Collections API functions", () => {
     expect(JSON.parse(options.body)).not.toHaveProperty("profile");
   });
 
-  it("fetchCollection by IDs sends collection_id and tag_id", async () => {
-    const mockFetch = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      headers: new Headers(),
-      json: () => Promise.resolve({ collection: {}, bread_crumbs: [] }),
-    });
-    vi.stubGlobal("fetch", mockFetch);
-
-    await fetchCollection("", "", 42, 7);
-
-    const [url, options] = mockFetch.mock.calls[0];
-    expect(url).toBe("/api/v1/collection");
-    expect(JSON.parse(options.body)).toEqual({ collection_id: 42, tag_id: 7 });
-  });
-
   it("fetchCollection by name sends repo_name and tag_name", async () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
@@ -386,12 +370,12 @@ describe("Collections API functions", () => {
     });
     vi.stubGlobal("fetch", mockFetch);
 
-    await fetchCollection("", "", 42, 7, "cpu#zen2");
+    await fetchCollection("qnib/featuretest", "arm64", "cpu#zen2");
 
     const [, options] = mockFetch.mock.calls[0];
     expect(JSON.parse(options.body)).toEqual({
-      collection_id: 42,
-      tag_id: 7,
+      repo_name: "qnib/featuretest",
+      tag_name: "arm64",
       profile: "cpu#zen2",
     });
   });
@@ -405,10 +389,10 @@ describe("Collections API functions", () => {
     });
     vi.stubGlobal("fetch", mockFetch);
 
-    await fetchCollection("", "", 42, 7, "");
+    await fetchCollection("qnib/featuretest", "arm64", "");
 
     const [, options] = mockFetch.mock.calls[0];
-    expect(JSON.parse(options.body)).toEqual({ collection_id: 42, tag_id: 7 });
+    expect(JSON.parse(options.body)).toEqual({ repo_name: "qnib/featuretest", tag_name: "arm64" });
     expect(JSON.parse(options.body)).not.toHaveProperty("profile");
   });
 });
@@ -523,7 +507,7 @@ describe("Profiles API functions", () => {
 
   it("fetchProfiles returns profiles array from response", async () => {
     const mockProfiles = [
-      { id: 1, name: "generic", tag: "v1", label: "generic#v1", rules: [] },
+      { name: "generic", tag: "v1", label: "generic#v1", rules: [] },
     ];
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
@@ -545,7 +529,6 @@ describe("Profiles API functions", () => {
       headers: new Headers(),
       json: () =>
         Promise.resolve({
-          id: 2,
           name: "cpu",
           tag: "zen2",
           label: "cpu#zen2",
@@ -568,12 +551,11 @@ describe("Profiles API functions", () => {
 
   it("fetchProfileDetail returns the parsed detail payload", async () => {
     const payload = {
-      id: 2,
       name: "cpu",
       tag: "zen2",
       label: "cpu#zen2",
       rules: [
-        { id: 2, type: "anno", op: "eq", key: "hw.microarch", value: "zen2" },
+        { type: "anno", op: "eq", key: "hw.microarch", value: "zen2" },
       ],
       collection_count: 3,
       manifest_count: 7,

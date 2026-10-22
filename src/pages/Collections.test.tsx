@@ -58,16 +58,12 @@ describe("Collections", () => {
         qnib: {
           repo: "qnib",
           tag: "",
-          collection_id: 0,
-          tag_id: 0,
           collection_count: 5,
           manifest_count: 0,
         },
         biocontainers: {
           repo: "biocontainers",
           tag: "",
-          collection_id: 0,
-          tag_id: 0,
           collection_count: 12,
           manifest_count: 0,
         },
@@ -92,8 +88,6 @@ describe("Collections", () => {
         qnib: {
           repo: "qnib",
           tag: "",
-          collection_id: 0,
-          tag_id: 0,
           collection_count: 5,
           manifest_count: 0,
         },
@@ -117,8 +111,6 @@ describe("Collections", () => {
         latest: {
           repo: "qnib/featuretest",
           tag: "latest",
-          collection_id: 0,
-          tag_id: 0,
           collection_count: 0,
           manifest_count: 13,
         },
@@ -142,16 +134,12 @@ describe("Collections", () => {
         qnib: {
           repo: "qnib",
           tag: "",
-          collection_id: 0,
-          tag_id: 0,
           collection_count: 5,
           manifest_count: 0,
         },
         biocontainers: {
           repo: "biocontainers",
           tag: "",
-          collection_id: 0,
-          tag_id: 0,
           collection_count: 12,
           manifest_count: 0,
         },
@@ -181,8 +169,6 @@ describe("Collections", () => {
         qnib: {
           repo: "qnib",
           tag: "",
-          collection_id: 0,
-          tag_id: 0,
           collection_count: 5,
           manifest_count: 0,
         },
@@ -212,8 +198,6 @@ describe("Collections", () => {
         qnib: {
           repo: "qnib",
           tag: "",
-          collection_id: 0,
-          tag_id: 0,
           collection_count: 5,
           manifest_count: 0,
         },
@@ -292,8 +276,6 @@ describe("Collections", () => {
               latest: {
                 repo: "qnib/ftest",
                 tag: "latest",
-                collection_id: 34,
-                tag_id: 31,
                 collection_count: 1,
                 manifest_count: 4,
               },
@@ -325,8 +307,6 @@ describe("Collections", () => {
       expect(mockFetchCollection).toHaveBeenCalledWith(
         "qnib/ftest",
         "latest",
-        undefined,
-        undefined,
         "cpu#zen2"
       );
     });
@@ -386,8 +366,6 @@ describe("Collections", () => {
               ftest: {
                 repo: "qnib/ftest",
                 tag: "latest",
-                collection_id: 34,
-                tag_id: 31,
                 collection_count: 1,
                 manifest_count: 4,
               },
@@ -402,8 +380,6 @@ describe("Collections", () => {
               latest: {
                 repo: "qnib/ftest",
                 tag: "latest",
-                collection_id: 34,
-                tag_id: 31,
                 collection_count: 1,
                 manifest_count: 4,
               },
@@ -442,8 +418,6 @@ describe("Collections", () => {
       expect(mockFetchCollection).toHaveBeenCalledWith(
         "qnib/ftest",
         "latest",
-        undefined,
-        undefined,
         ""
       );
     });
@@ -471,8 +445,6 @@ describe("Collections", () => {
       expect(mockFetchCollection).toHaveBeenCalledWith(
         "qnib/ftest",
         "latest",
-        undefined,
-        undefined,
         "cpu#zen2"
       );
     });

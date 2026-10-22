@@ -98,7 +98,7 @@ export function Collections() {
   const { data: detailData, isLoading: detailLoading } = useQuery({
     queryKey: ["collection", repoName, tagName, selectedProfile],
     queryFn: () =>
-      fetchCollection(repoName, tagName, undefined, undefined, selectedProfile),
+      fetchCollection(repoName, tagName, selectedProfile),
     enabled: !!selectedTagEntry && !!repoName && !!tagName,
   });
 
@@ -118,7 +118,7 @@ export function Collections() {
     ? `?profile=${encodeURIComponent(selectedProfile)}`
     : "";
 
-  const handleItemClick = (key: string, item: { repo: string; tag: string; collection_id: number; tag_id: number; collection_count: number; manifest_count: number }) => {
+  const handleItemClick = (key: string, item: { repo: string; tag: string; collection_count: number; manifest_count: number }) => {
     if (item.tag) {
       // This is a tag — navigate to name-based collection detail URL.
       // Use the full repo from item.repo (not repoPrefix) to handle
