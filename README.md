@@ -1,6 +1,6 @@
 # MetaHub UI
 
-Web frontend for [metahub-api](https://gitlab.com/qnib-golang/metahub-api) -- a container image registry with profile-aware image indexes.
+Web frontend for [metahub-api](https://github.com/MetaHub-Registry/metahub-api) -- a container image registry with profile-aware image indexes.
 
 Built with React, TypeScript, Vite, Tailwind CSS, and shadcn/ui.
 
