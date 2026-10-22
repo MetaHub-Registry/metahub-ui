@@ -84,7 +84,7 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `@nodelib/fs.stat@2.0.5` | MIT | https://github.com/nodelib/nodelib/tree/master/packages/fs/fs.stat |
 | `@nodelib/fs.walk@1.2.8` | MIT | https://github.com/nodelib/nodelib/tree/master/packages/fs/fs.walk |
 | `@oxc-project/types@0.155.0` | MIT | https://github.com/oxc-project/oxc |
-| `@rolldown/binding-linux-arm64-gnu@1.2.15` | MIT | https://github.com/rolldown/rolldown |
+| `@rolldown/binding-linux-x64-gnu@1.2.15` | MIT | https://github.com/rolldown/rolldown |
 | `@rolldown/pluginutils@1.0.0-rc.7` | MIT | https://github.com/rolldown/rolldown |
 | `@rolldown/pluginutils@1.0.1` | MIT | https://github.com/rolldown/plugins |
 | `@sec-ant/readable-stream@0.4.1` | MIT | https://github.com/Sec-ant/readable-stream |
@@ -92,7 +92,7 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `@sindresorhus/merge-streams@4.0.0` | MIT | https://github.com/sindresorhus/merge-streams |
 | `@standard-schema/spec@1.1.0` | MIT | https://github.com/standard-schema/standard-schema |
 | `@tailwindcss/node@4.2.2` | MIT | https://github.com/tailwindlabs/tailwindcss |
-| `@tailwindcss/oxide-linux-arm64-gnu@4.2.2` | MIT | https://github.com/tailwindlabs/tailwindcss |
+| `@tailwindcss/oxide-linux-x64-gnu@4.2.2` | MIT | https://github.com/tailwindlabs/tailwindcss |
 | `@tailwindcss/oxide@4.2.2` | MIT | https://github.com/tailwindlabs/tailwindcss |
 | `@tailwindcss/vite@4.2.2` | MIT | https://github.com/tailwindlabs/tailwindcss |
 | `@tanstack/query-core@5.95.2` | MIT | https://github.com/TanStack/query |
@@ -331,8 +331,8 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `kleur@3.0.3` | MIT | https://github.com/lukeed/kleur |
 | `kleur@4.1.5` | MIT | https://github.com/lukeed/kleur |
 | `levn@0.4.1` | MIT | https://github.com/gkz/levn |
-| `lightningcss-linux-arm64-gnu@1.32.0` | MPL-2.0 | https://github.com/parcel-bundler/lightningcss |
-| `lightningcss-linux-arm64-gnu@1.33.0` | MPL-2.0 | https://github.com/parcel-bundler/lightningcss |
+| `lightningcss-linux-x64-gnu@1.32.0` | MPL-2.0 | https://github.com/parcel-bundler/lightningcss |
+| `lightningcss-linux-x64-gnu@1.33.0` | MPL-2.0 | https://github.com/parcel-bundler/lightningcss |
 | `lightningcss@1.32.0` | MPL-2.0 | https://github.com/parcel-bundler/lightningcss |
 | `lightningcss@1.33.0` | MPL-2.0 | https://github.com/parcel-bundler/lightningcss |
 | `locate-path@6.0.0` | MIT | https://github.com/sindresorhus/locate-path |
