@@ -131,3 +131,22 @@ as `*.test.tsx` / `*.test.ts`.
 - Profile filter selection has no effect on collection listing
 - No profile detail page exists (only a card grid)
 - Manifest cards don't show which profile they're served under
+
+## 2026-10-23 — open-source-metahub
+
+### What changed
+
+- Removed storage IDs from the API types and routes: collections by
+  `repo`+`tag`, ORAS by `repo`+`digest`, profiles by `label`/rule tuple,
+  secrets by `name`.
+- Public CI fast lane + aggregator.
+
+### Key files
+
+- `src/lib/api.ts`, `src/pages/Collections.tsx`, `src/pages/OrasArtifacts.tsx`
+- OpenSpec: `openspec/changes/{add-public-ci,natural-key-identifiers}/`
+
+### Gotchas
+
+- The old `/collection/<id>/tag/<id>` URLs are gone; use `repo`+`tag`.
+- `UserSecret.id` no longer exists; delete by `name`.

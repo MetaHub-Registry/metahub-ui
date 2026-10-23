@@ -23,6 +23,5 @@ coverage
 *.sln
 *.sw?
 .env
-openspec/changes/
 agent.compose.yaml
 agent.compose.lock
