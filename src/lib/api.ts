@@ -189,7 +189,6 @@ export interface CollectionDetailResponse {
 }
 
 export interface UserSecret {
-  id: number;
   name: string;
   secret_key: string;
   is_copied: boolean;
@@ -406,8 +405,8 @@ export function createUserSecret(name: string) {
   );
 }
 
-export function deleteUserSecret(id: string) {
-  return apiFetch<void>(`/api/v1/protected/user/secret/${id}`, {
+export function deleteUserSecret(name: string) {
+  return apiFetch<void>(`/api/v1/protected/user/secret/${name}`, {
     method: "DELETE",
   });
 }
