@@ -132,8 +132,6 @@ export interface BreadCrumb {
 export interface CollectionNext {
   repo: string;
   tag: string;
-  collection_id: number;
-  tag_id: number;
   collection_count: number;
   manifest_count: number;
 }
@@ -191,7 +189,6 @@ export interface CollectionDetailResponse {
 }
 
 export interface UserSecret {
-  id: number;
   name: string;
   secret_key: string;
   is_copied: boolean;
@@ -230,7 +227,6 @@ export interface OrasBlob {
 }
 
 export interface OrasArtifact {
-  id: number;
   repo: string;
   digest: string;
   media_type: string;
@@ -267,18 +263,12 @@ export function fetchCollections(repoPrefix: string, profile?: string) {
 export function fetchCollection(
   repoName: string,
   tagName: string,
-  collectionId?: number,
-  tagId?: number,
   profile?: string
 ) {
-  const body: Record<string, string | number> = {};
-  if (collectionId && tagId) {
-    body.collection_id = collectionId;
-    body.tag_id = tagId;
-  } else {
-    body.repo_name = repoName;
-    body.tag_name = tagName;
-  }
+  const body: Record<string, string> = {
+    repo_name: repoName,
+    tag_name: tagName,
+  };
   // When a profile is selected, ask the server to narrow the manifests
   // to that profile. The handler (RepoGetOne) filters server-side; the
   // UI no longer post-filters. Empty/undefined profile = no filter.
@@ -415,8 +405,8 @@ export function createUserSecret(name: string) {
   );
 }
 
-export function deleteUserSecret(id: string) {
-  return apiFetch<void>(`/api/v1/protected/user/secret/${id}`, {
+export function deleteUserSecret(name: string) {
+  return apiFetch<void>(`/api/v1/protected/user/secret/${name}`, {
     method: "DELETE",
   });
 }
@@ -513,7 +503,6 @@ export async function godmodeLogin(
 // ─── Profiles API ────────────────────────────────────────────────
 
 export interface ApiProfileRule {
-  id: number;
   type: string;
   op: string;
   key: string;
@@ -521,7 +510,6 @@ export interface ApiProfileRule {
 }
 
 export interface ApiProfile {
-  id: number;
   name: string;
   tag: string;
   label: string;
@@ -572,7 +560,6 @@ export interface ApiManipuVariant {
 }
 
 export interface ApiManipulation {
-  id: number;
   label: string;
   default?: ApiManipuConfig;
   variants?: ApiManipuVariant[];
@@ -580,7 +567,6 @@ export interface ApiManipulation {
 }
 
 export interface ProfileDetailResponse {
-  id: number;
   name: string;
   tag: string;
   label: string;
