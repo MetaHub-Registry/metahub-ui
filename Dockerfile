@@ -2,7 +2,7 @@
 # Pinned to $BUILDPLATFORM: the JS build is arch-independent and runs natively
 # on the build agent (no QEMU). The per-arch nginx:alpine runtime only COPYs
 # static output.
-FROM --platform=$BUILDPLATFORM node:lts-alpine AS build
+FROM --platform=$BUILDPLATFORM mirror.gcr.io/library/node:lts-alpine AS build
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Serve
-FROM nginx:alpine
+FROM mirror.gcr.io/library/nginx:alpine
 
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
