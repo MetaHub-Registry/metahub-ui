@@ -35,11 +35,12 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `@babel/plugin-transform-typescript@7.28.6` | MIT | https://github.com/babel/babel |
 | `@babel/preset-typescript@7.28.5` | MIT | https://github.com/babel/babel |
 | `@babel/runtime@7.29.2` | MIT | https://github.com/babel/babel |
+| `@babel/runtime@8.0.7` | MIT | https://github.com/babel/babel |
 | `@babel/template@7.29.7` | MIT | https://github.com/babel/babel |
 | `@babel/traverse@7.29.10` | MIT | https://github.com/babel/babel |
 | `@babel/types@7.29.8` | MIT | https://github.com/babel/babel |
-| `@base-ui/react@1.3.0` | MIT | https://github.com/mui/base-ui |
-| `@base-ui/utils@0.2.6` | MIT | https://github.com/mui/base-ui |
+| `@base-ui/react@1.9.0` | MIT | https://github.com/mui/base-ui |
+| `@base-ui/utils@0.5.0` | MIT | https://github.com/mui/base-ui |
 | `@bcoe/v8-coverage@1.0.2` | MIT | https://github.com/bcoe/v8-coverage |
 | `@bramus/specificity@2.4.2` | MIT | https://github.com/bramus/specificity |
 | `@csstools/color-helpers@6.0.2` | MIT-0 | https://github.com/csstools/postcss-plugins |
@@ -60,10 +61,10 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `@eslint/object-schema@2.1.7` | Apache-2.0 | https://github.com/eslint/rewrite |
 | `@eslint/plugin-kit@0.4.1` | Apache-2.0 | https://github.com/eslint/rewrite |
 | `@exodus/bytes@1.15.0` | MIT | https://github.com/ExodusOSS/bytes |
-| `@floating-ui/core@1.7.5` | MIT | https://github.com/floating-ui/floating-ui |
-| `@floating-ui/dom@1.7.6` | MIT | https://github.com/floating-ui/floating-ui |
-| `@floating-ui/react-dom@2.1.8` | MIT | https://github.com/floating-ui/floating-ui |
-| `@floating-ui/utils@0.2.11` | MIT | https://github.com/floating-ui/floating-ui |
+| `@floating-ui/core@1.8.0` | MIT | https://github.com/floating-ui/floating-ui |
+| `@floating-ui/dom@1.8.0` | MIT | https://github.com/floating-ui/floating-ui |
+| `@floating-ui/react-dom@2.1.9` | MIT | https://github.com/floating-ui/floating-ui |
+| `@floating-ui/utils@0.2.12` | MIT | https://github.com/floating-ui/floating-ui |
 | `@fontsource-variable/geist@5.2.8` | OFL-1.1 | https://github.com/fontsource/font-files |
 | `@hono/node-server@2.1.5` | MIT | https://github.com/honojs/node-server |
 | `@humanfs/core@0.19.2` | Apache-2.0 | https://github.com/humanwhocodes/humanfs |
@@ -416,7 +417,7 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `recast@0.23.11` | MIT | https://github.com/benjamn/recast |
 | `redent@3.0.0` | MIT | https://github.com/sindresorhus/redent |
 | `require-from-string@2.0.2` | MIT | https://github.com/floatdrop/require-from-string |
-| `reselect@5.1.1` | MIT | https://github.com/reduxjs/reselect |
+| `reselect@5.3.0` | MIT | https://github.com/reduxjs/reselect |
 | `resolve-from@4.0.0` | MIT | https://github.com/sindresorhus/resolve-from |
 | `restore-cursor@5.1.0` | MIT | https://github.com/sindresorhus/restore-cursor |
 | `reusify@1.1.0` | MIT | https://github.com/mcollina/reusify |
@@ -463,7 +464,6 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `strip-json-comments@3.1.1` | MIT | https://github.com/sindresorhus/strip-json-comments |
 | `supports-color@7.2.0` | MIT | https://github.com/chalk/supports-color |
 | `symbol-tree@3.2.4` | MIT | https://github.com/jsdom/js-symbol-tree |
-| `tabbable@6.4.0` | MIT | https://github.com/focus-trap/tabbable |
 | `tailwind-merge@3.5.0` | MIT | https://github.com/dcastil/tailwind-merge |
 | `tailwindcss@4.2.2` | MIT | https://github.com/tailwindlabs/tailwindcss |
 | `tapable@2.3.2` | MIT | https://github.com/webpack/tapable |
@@ -495,7 +495,7 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `unpipe@1.0.0` | MIT | https://github.com/stream-utils/unpipe |
 | `update-browserslist-db@1.3.4` | MIT | https://github.com/browserslist/update-db |
 | `uri-js@4.4.1` | BSD-2-Clause | https://github.com/garycourt/uri-js |
-| `use-sync-external-store@1.6.0` | MIT | https://github.com/facebook/react |
+| `use-sync-external-store@1.7.0` | MIT | https://github.com/react/react |
 | `util-deprecate@1.0.2` | MIT | https://github.com/TooTallNate/util-deprecate |
 | `validate-npm-package-name@7.0.2` | ISC | https://github.com/npm/validate-npm-package-name |
 | `vary@1.1.2` | MIT | https://github.com/jshttp/vary |
