@@ -109,7 +109,7 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `@types/json-schema@7.0.15` | MIT | https://github.com/DefinitelyTyped/DefinitelyTyped |
 | `@types/node@24.12.0` | MIT | https://github.com/DefinitelyTyped/DefinitelyTyped |
 | `@types/react-dom@19.2.3` | MIT | https://github.com/DefinitelyTyped/DefinitelyTyped |
-| `@types/react@19.2.14` | MIT | https://github.com/DefinitelyTyped/DefinitelyTyped |
+| `@types/react@19.3.0` | MIT | https://github.com/DefinitelyTyped/DefinitelyTyped |
 | `@types/validate-npm-package-name@4.0.2` | MIT | https://github.com/DefinitelyTyped/DefinitelyTyped |
 | `@typescript-eslint/eslint-plugin@8.57.2` | MIT | https://github.com/typescript-eslint/typescript-eslint |
 | `@typescript-eslint/parser@8.57.2` | MIT | https://github.com/typescript-eslint/typescript-eslint |
@@ -409,11 +409,11 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `queue-microtask@1.2.3` | MIT | https://github.com/feross/queue-microtask |
 | `range-parser@1.3.0` | MIT | https://github.com/jshttp/range-parser |
 | `raw-body@3.0.2` | MIT | https://github.com/stream-utils/raw-body |
-| `react-dom@19.2.4` | MIT | https://github.com/facebook/react |
+| `react-dom@19.3.1` | MIT | https://github.com/react/react |
 | `react-is@17.0.2` | MIT | https://github.com/facebook/react |
 | `react-router-dom@7.18.4` | MIT | https://github.com/remix-run/react-router |
 | `react-router@7.18.4` | MIT | https://github.com/remix-run/react-router |
-| `react@19.2.4` | MIT | https://github.com/facebook/react |
+| `react@19.3.1` | MIT | https://github.com/react/react |
 | `recast@0.23.11` | MIT | https://github.com/benjamn/recast |
 | `redent@3.0.0` | MIT | https://github.com/sindresorhus/redent |
 | `require-from-string@2.0.2` | MIT | https://github.com/floatdrop/require-from-string |
@@ -427,7 +427,7 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `run-parallel@1.2.0` | MIT | https://github.com/feross/run-parallel |
 | `safer-buffer@2.1.2` | MIT | https://github.com/ChALkeR/safer-buffer |
 | `saxes@6.0.0` | ISC | https://github.com/lddubeau/saxes |
-| `scheduler@0.27.0` | MIT | https://github.com/facebook/react |
+| `scheduler@0.28.0` | MIT | https://github.com/react/react |
 | `semver@6.3.1` | ISC | https://github.com/npm/node-semver |
 | `semver@7.7.4` | ISC | https://github.com/npm/node-semver |
 | `send@1.2.1` | MIT | https://github.com/pillarjs/send |
