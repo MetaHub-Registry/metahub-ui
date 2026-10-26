@@ -99,7 +99,7 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `@tanstack/react-query@5.95.2` | MIT | https://github.com/TanStack/query |
 | `@testing-library/dom@10.4.1` | MIT | https://github.com/testing-library/dom-testing-library |
 | `@testing-library/jest-dom@6.9.1` | MIT | https://github.com/testing-library/jest-dom |
-| `@testing-library/react@16.3.2` | MIT | https://github.com/testing-library/react-testing-library |
+| `@testing-library/react@16.3.3` | MIT | https://github.com/testing-library/react-testing-library |
 | `@ts-morph/common@0.27.0` | MIT | https://github.com/dsherret/ts-morph |
 | `@types/aria-query@5.0.4` | MIT | https://github.com/DefinitelyTyped/DefinitelyTyped |
 | `@types/chai@5.2.3` | MIT | https://github.com/DefinitelyTyped/DefinitelyTyped |
