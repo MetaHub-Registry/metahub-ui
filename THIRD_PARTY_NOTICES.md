@@ -427,7 +427,7 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `run-parallel@1.2.0` | MIT | https://github.com/feross/run-parallel |
 | `safer-buffer@2.1.2` | MIT | https://github.com/ChALkeR/safer-buffer |
 | `saxes@6.0.0` | ISC | https://github.com/lddubeau/saxes |
-| `scheduler@0.27.0` | MIT | https://github.com/facebook/react |
+| `scheduler@0.28.0` | MIT | https://github.com/react/react |
 | `semver@6.3.1` | ISC | https://github.com/npm/node-semver |
 | `semver@7.7.4` | ISC | https://github.com/npm/node-semver |
 | `send@1.2.1` | MIT | https://github.com/pillarjs/send |
