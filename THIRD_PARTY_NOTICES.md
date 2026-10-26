@@ -340,7 +340,7 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `log-symbols@6.0.0` | MIT | https://github.com/sindresorhus/log-symbols |
 | `lru-cache@11.2.7` | BlueOak-1.0.0 | https://github.com/isaacs/node-lru-cache |
 | `lru-cache@5.1.1` | ISC | https://github.com/isaacs/node-lru-cache |
-| `lucide-react@1.6.0` | ISC | https://github.com/lucide-icons/lucide |
+| `lucide-react@1.60.0` | ISC | https://github.com/lucide-icons/lucide |
 | `lz-string@1.5.0` | MIT | https://github.com/pieroxy/lz-string |
 | `magic-string@0.30.21` | MIT | https://github.com/Rich-Harris/magic-string |
 | `magicast@0.5.2` | MIT | https://github.com/unjs/magicast |
