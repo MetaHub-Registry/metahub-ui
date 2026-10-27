@@ -508,4 +508,4 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `yoctocolors@2.1.2` | MIT | https://github.com/sindresorhus/yoctocolors |
 | `zod-to-json-schema@3.25.2` | ISC | https://github.com/StefanTerdell/zod-to-json-schema |
 | `zod-validation-error@4.0.2` | MIT | https://github.com/causaly/zod-validation-error |
-| `zod@4.3.6` | MIT | https://github.com/colinhacks/zod |
+| `zod@4.6.7` | MIT | https://github.com/colinhacks/zod |
