@@ -8,8 +8,8 @@ in GoCD, which contributors cannot see or run.
 
 ## What Changes
 
-Add a public, fork-safe fast lane to `metahub-ui` and keep the slow, container-
-backed checks in a separate release-gating workflow.
+Add a public, fork-safe fast lane to `metahub-ui`. The repository has no
+container-backed tests, so there is no separate integration workflow.
 
 - `npm ci --ignore-scripts`
 - `npm run build`
@@ -40,8 +40,8 @@ None.
 
 - New `.github/workflows/`, `.github/scripts/`, allowlists and
   `THIRD_PARTY_NOTICES.md`; `.github/dependabot.yml` for dependency updates.
-- Test-only changes where the container boundary had to be expressed with
-  `testing.Short()`.
+- The `shadcn` CLI moves to `devDependencies` so the production audit graph is
+  accurate.
 - No runtime behaviour, API, image or GoCD pipeline change.
 - Part of the session lane `oss-public-ci`; the visibility flip is gated on this
   lane being green.
