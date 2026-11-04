@@ -52,18 +52,6 @@ Coverage output:
 - `coverage/lcov.info` -- LCOV format (for SonarQube)
 - `coverage/lcov-report/index.html` -- HTML report (open in browser)
 
-### SonarQube
-
-```bash
-# Generate coverage first
-npm run test:coverage
-
-# Submit to SonarQube
-./misc/bin/sonar.sh
-```
-
-The script reads `SONAR_QUBE_URL`, `SONAR_QUBE_TOKEN`, and `SONAR_QUBE_PROJECT` from `.env`.
-
 ## Deployment
 
 ### Docker
