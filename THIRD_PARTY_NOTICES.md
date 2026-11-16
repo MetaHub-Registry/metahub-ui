@@ -99,8 +99,8 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `@tailwindcss/oxide-linux-x64-gnu@4.2.2` | MIT | https://github.com/tailwindlabs/tailwindcss |
 | `@tailwindcss/oxide@4.2.2` | MIT | https://github.com/tailwindlabs/tailwindcss |
 | `@tailwindcss/vite@4.2.2` | MIT | https://github.com/tailwindlabs/tailwindcss |
-| `@tanstack/query-core@5.95.2` | MIT | https://github.com/TanStack/query |
-| `@tanstack/react-query@5.95.2` | MIT | https://github.com/TanStack/query |
+| `@tanstack/query-core@5.105.3` | MIT | https://github.com/TanStack/query |
+| `@tanstack/react-query@5.105.3` | MIT | https://github.com/TanStack/query |
 | `@testing-library/dom@10.4.1` | MIT | https://github.com/testing-library/dom-testing-library |
 | `@testing-library/jest-dom@6.9.1` | MIT | https://github.com/testing-library/jest-dom |
 | `@testing-library/react@16.3.3` | MIT | https://github.com/testing-library/react-testing-library |
@@ -115,16 +115,16 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `@types/react-dom@19.2.3` | MIT | https://github.com/DefinitelyTyped/DefinitelyTyped |
 | `@types/react@19.3.0` | MIT | https://github.com/DefinitelyTyped/DefinitelyTyped |
 | `@types/validate-npm-package-name@4.0.2` | MIT | https://github.com/DefinitelyTyped/DefinitelyTyped |
-| `@typescript-eslint/eslint-plugin@8.57.2` | MIT | https://github.com/typescript-eslint/typescript-eslint |
-| `@typescript-eslint/parser@8.57.2` | MIT | https://github.com/typescript-eslint/typescript-eslint |
-| `@typescript-eslint/project-service@8.57.2` | MIT | https://github.com/typescript-eslint/typescript-eslint |
-| `@typescript-eslint/scope-manager@8.57.2` | MIT | https://github.com/typescript-eslint/typescript-eslint |
-| `@typescript-eslint/tsconfig-utils@8.57.2` | MIT | https://github.com/typescript-eslint/typescript-eslint |
-| `@typescript-eslint/type-utils@8.57.2` | MIT | https://github.com/typescript-eslint/typescript-eslint |
-| `@typescript-eslint/types@8.57.2` | MIT | https://github.com/typescript-eslint/typescript-eslint |
-| `@typescript-eslint/typescript-estree@8.57.2` | MIT | https://github.com/typescript-eslint/typescript-eslint |
-| `@typescript-eslint/utils@8.57.2` | MIT | https://github.com/typescript-eslint/typescript-eslint |
-| `@typescript-eslint/visitor-keys@8.57.2` | MIT | https://github.com/typescript-eslint/typescript-eslint |
+| `@typescript-eslint/eslint-plugin@8.72.1` | MIT | https://github.com/typescript-eslint/typescript-eslint |
+| `@typescript-eslint/parser@8.72.1` | MIT | https://github.com/typescript-eslint/typescript-eslint |
+| `@typescript-eslint/project-service@8.72.1` | MIT | https://github.com/typescript-eslint/typescript-eslint |
+| `@typescript-eslint/scope-manager@8.72.1` | MIT | https://github.com/typescript-eslint/typescript-eslint |
+| `@typescript-eslint/tsconfig-utils@8.72.1` | MIT | https://github.com/typescript-eslint/typescript-eslint |
+| `@typescript-eslint/type-utils@8.72.1` | MIT | https://github.com/typescript-eslint/typescript-eslint |
+| `@typescript-eslint/types@8.72.1` | MIT | https://github.com/typescript-eslint/typescript-eslint |
+| `@typescript-eslint/typescript-estree@8.72.1` | MIT | https://github.com/typescript-eslint/typescript-eslint |
+| `@typescript-eslint/utils@8.72.1` | MIT | https://github.com/typescript-eslint/typescript-eslint |
+| `@typescript-eslint/visitor-keys@8.72.1` | MIT | https://github.com/typescript-eslint/typescript-eslint |
 | `@vitejs/plugin-react@6.0.1` | MIT | https://github.com/vitejs/vite-plugin-react |
 | `@vitest/coverage-v8@4.1.12` | MIT | https://github.com/vitest-dev/vitest |
 | `@vitest/expect@4.1.12` | MIT | https://github.com/vitest-dev/vitest |
@@ -282,7 +282,7 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `human-signals@8.0.1` | Apache-2.0 | https://github.com/ehmicky/human-signals |
 | `iconv-lite@0.7.3` | MIT | https://github.com/pillarjs/iconv-lite |
 | `ignore@5.3.2` | MIT | https://github.com/kaelzhang/node-ignore |
-| `ignore@7.0.5` | MIT | https://github.com/kaelzhang/node-ignore |
+| `ignore@7.0.14` | MIT | https://github.com/kaelzhang/node-ignore |
 | `imurmurhash@0.1.4` | MIT | https://github.com/jensyt/imurmurhash-js |
 | `indent-string@4.0.0` | MIT | https://github.com/sindresorhus/indent-string |
 | `inherits@2.0.4` | ISC | https://github.com/isaacs/inherits |
@@ -421,6 +421,7 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `scheduler@0.28.0` | MIT | https://github.com/react/react |
 | `semver@6.3.1` | ISC | https://github.com/npm/node-semver |
 | `semver@7.7.4` | ISC | https://github.com/npm/node-semver |
+| `semver@7.8.6` | ISC | https://github.com/npm/node-semver |
 | `send@1.2.1` | MIT | https://github.com/pillarjs/send |
 | `serve-static@2.2.1` | MIT | https://github.com/expressjs/serve-static |
 | `set-cookie-parser@2.7.2` | MIT | https://github.com/nfriedly/set-cookie-parser |
@@ -456,6 +457,7 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `symbol-tree@3.2.4` | MIT | https://github.com/jsdom/js-symbol-tree |
 | `tailwind-merge@3.5.0` | MIT | https://github.com/dcastil/tailwind-merge |
 | `tailwindcss@4.2.2` | MIT | https://github.com/tailwindlabs/tailwindcss |
+| `tailwindcss@4.3.3` | MIT | https://github.com/tailwindlabs/tailwindcss |
 | `tapable@2.3.2` | MIT | https://github.com/webpack/tapable |
 | `tiny-invariant@1.3.3` | MIT | https://github.com/alexreardon/tiny-invariant |
 | `tinybench@2.9.0` | MIT | https://github.com/tinylibs/tinybench |
@@ -476,7 +478,7 @@ hand: run `.github/scripts/third-party-notices.sh > THIRD_PARTY_NOTICES.md`.
 | `type-check@0.4.0` | MIT | https://github.com/gkz/type-check |
 | `type-fest@4.41.0` | (MIT OR CC0-1.0) | https://github.com/sindresorhus/type-fest |
 | `type-is@2.1.0` | MIT | https://github.com/jshttp/type-is |
-| `typescript-eslint@8.57.2` | MIT | https://github.com/typescript-eslint/typescript-eslint |
+| `typescript-eslint@8.72.1` | MIT | https://github.com/typescript-eslint/typescript-eslint |
 | `typescript@5.9.3` | Apache-2.0 | https://github.com/microsoft/TypeScript |
 | `undici-types@7.16.0` | MIT | https://github.com/nodejs/undici |
 | `undici@7.30.1` | MIT | https://github.com/nodejs/undici |
